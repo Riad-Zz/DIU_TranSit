@@ -71,5 +71,4 @@ cursor: pointer;
 .hamburger .active {
   font-weight: 700;
   color: #15803D;
-  border-bottom: 1px solid #15803D;
 }

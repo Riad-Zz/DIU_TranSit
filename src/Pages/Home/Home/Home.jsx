@@ -1,9 +1,11 @@
 import React from 'react';
+import Banner from '../Banner/Banner';
+import Test from '../Test/Test';
 
 const Home = () => {
     return (
         <div>
-            <p className='text-4xl font-semibold text-center my-2'>Discover DIU transport</p>
+            <Banner></Banner>
         </div>
     );
 };
