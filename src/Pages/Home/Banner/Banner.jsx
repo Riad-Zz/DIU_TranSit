@@ -8,6 +8,7 @@ import { MdArrowOutward } from "react-icons/md";
 import banner1 from '../../../assets/busses.png';
 import banner2 from '../../../assets/routesss.png';
 import banner3 from '../../../assets/service.png';
+import { CiClock1 } from "react-icons/ci";
 
 const Banner = () => {
 
@@ -93,7 +94,7 @@ const Banner = () => {
                     </SwiperSlide>
                 ))}
             </Swiper>
-
+            
         </div>
     );
 };
