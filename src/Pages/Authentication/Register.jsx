@@ -6,24 +6,26 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import imageUpload from '../../assets/avatat.png'
 import { AuthContext } from '../../Providers/AuthProvider/AuthProvider';
 import axios from 'axios';
+import useAxios from "../../hooks/Axios/useAxios"
 
 const Register = () => {
 
-    const { register, handleSubmit,formState: { errors } } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
     const [eye, setEye] = useState(false);
     const [preview, setPreview] = useState(imageUpload)
     const { user, setUser, googleLogin, EmailRegister, updateUser } = use(AuthContext)
-    const location = useLocation() ;
-    const navigate = useNavigate() ;
+    const location = useLocation();
+    const navigate = useNavigate();
     const imageInputRef = useRef(null);  //HIU 01
+    const axiosInstance = useAxios()
 
-      //----------Hidden Image upload field Activate Control (HIU) -----------
-       //HIU ------> 02  
+    //----------Hidden Image upload field Activate Control (HIU) -----------
+    //HIU ------> 02  
     const handleUploadAvater = () => {
         imageInputRef.current.click();
     }
     //HIU ------> 03
-     const handleFileChange = (e) => {
+    const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setPreview(URL.createObjectURL(file));
@@ -58,12 +60,26 @@ const Register = () => {
                 if (currentUser) {
                     await updateUser({ displayName: data.name, photoURL: finalImageURL })
                         .then(() => {
-                            setUser({ ...currentUser,displayName: data.name, photoURL: finalImageURL })
+                            setUser({ ...currentUser, displayName: data.name, photoURL: finalImageURL })
                         })
                         .catch(error => {
                             const errorMessage = error.message;
                             console.log(errorMessage);
                         })
+                    const newUser = {
+                        name: data.name,
+                        email: data.email
+                    }
+
+                    //-------------Save the user to Database ---------------------
+                    axiosInstance.post('/users', newUser)
+                        .then(data => {
+                            if(data.data.id){
+                                console.log(data.data.id) ;
+                            }
+                        })
+
+                    
                 }
             })
     }
@@ -74,6 +90,21 @@ const Register = () => {
             const currentUser = result.user
             setUser(currentUser);
             navigate(location.state || '/');
+
+            const newUser = {
+                name: currentUser.displayName,
+                email: currentUser.email,
+            }
+
+            //-------------Save the user to Database ---------------------
+                    axiosInstance.post('/users', newUser)
+                        .then(data => {
+                            console.log(data) ;
+                            if(data.data.id){
+                                console.log(data.data.id) ;
+                            }
+                        })
+
         })
             .catch((error) => {
                 const errorMessage = error.message;
@@ -188,7 +219,7 @@ const Register = () => {
                         <input type="checkbox" className="checkbox " />
                         <p className='font-bold text-sm'>Remember me</p>
                     </div>
-                   
+
                 </div>
 
                 <button type="submit" className="btn mt-7 mb-3 bg-primary transition font-bold border-none text-white w-full py-3 rounded-lg">
