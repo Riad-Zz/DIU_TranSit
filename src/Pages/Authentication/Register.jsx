@@ -5,13 +5,14 @@ import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 import imageUpload from '../../assets/avatat.png'
 import { AuthContext } from '../../Providers/AuthProvider/AuthProvider';
+import axios from 'axios';
 
 const Register = () => {
 
     const { register, handleSubmit,formState: { errors } } = useForm()
     const [eye, setEye] = useState(false);
     const [preview, setPreview] = useState(imageUpload)
-    const { user, setUser, googleLogin} = use(AuthContext);
+    const { user, setUser, googleLogin, EmailRegister, updateUser } = use(AuthContext)
     const location = useLocation() ;
     const navigate = useNavigate() ;
     const imageInputRef = useRef(null);  //HIU 01
@@ -37,42 +38,34 @@ const Register = () => {
 
     const handleRegister = async (data, e) => {
         console.log(data);
+        const profileImage = data.avatar[0];
+        e.target.reset();
+        setPreview(imageUpload)
+        const formData = new FormData();
+        formData.append('image', profileImage)
+        const profileImageApiURL = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_UPLOAD_KEY}`
 
-        // //Step 1 of Uploading a image to ImageBB
-        // const profileImage = data.avatar[0];
-
-        // e.target.reset();
-        // setPreview(imageUpload)
-
-        // //Step 2 of Uploading a image to ImageBB
-        // const formData = new FormData();
-        // formData.append('image', profileImage)
-
-        // //Step 3 of Uploading a image to ImageBB
-        // const profileImageApiURL = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_UPLOAD_KEY}`
-
-        // //Step 4 of Uploading a image to ImageBB
-        // const res = await axios.post(profileImageApiURL, formData);
-        // const finalImageURL = res.data.data.url;
-        // console.log(finalImageURL);
+        const res = await axios.post(profileImageApiURL, formData);
+        const finalImageURL = res.data.data.url;
+        console.log(finalImageURL);
 
 
-        // EmailRegister(data.email, data.password)
-        //     .then(async (result) => {
-        //         const currentUser = result.user
-        //         setUser(currentUser);
-        //         navigate(location.state || '/');
-        //         if (currentUser) {
-        //             await updateUser({ displayName: data.name, photoURL: finalImageURL })
-        //                 .then(() => {
-        //                     setUser({ ...currentUser,displayName: data.name, photoURL: finalImageURL })
-        //                 })
-        //                 .catch(error => {
-        //                     const errorMessage = error.message;
-        //                     console.log(errorMessage);
-        //                 })
-        //         }
-        //     })
+        EmailRegister(data.email, data.password)
+            .then(async (result) => {
+                const currentUser = result.user
+                setUser(currentUser);
+                navigate(location.state || '/');
+                if (currentUser) {
+                    await updateUser({ displayName: data.name, photoURL: finalImageURL })
+                        .then(() => {
+                            setUser({ ...currentUser,displayName: data.name, photoURL: finalImageURL })
+                        })
+                        .catch(error => {
+                            const errorMessage = error.message;
+                            console.log(errorMessage);
+                        })
+                }
+            })
     }
 
     //-----------------Handle Google Login --------------------------------
