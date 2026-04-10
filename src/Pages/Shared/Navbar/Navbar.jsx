@@ -11,7 +11,7 @@ const Navbar = () => {
         {/* <li className='text-base-content text-[16px] font-medium mb-1'><NavLink to={'/services'}>Services</NavLink></li> */}
         <li className='text-base-content text-[16px] font-bold mb-1'><NavLink to={'/schedule'}>Schedule</NavLink></li>
         <li className='text-base-content text-[16px] font-bold mb-1'><NavLink to={'/cardapply'}>Card Apply</NavLink></li>
-        <li className='text-base-content text-[16px] font-bold mb-1'><NavLink to={'/aboutus'}>About Us</NavLink></li>
+        {/* <li className='text-base-content text-[16px] font-bold mb-1'><NavLink to={'/aboutus'}>About Us</NavLink></li> */}
         <li className='text-base-content text-[16px] font-bold mb-1'><NavLink to={'/contact'}>Contact</NavLink></li>
     </>
 

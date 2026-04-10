@@ -5,6 +5,7 @@ import Login from "../Pages/Authentication/Login";
 import AuthLayout from "../Layout/AuthLayout/AuthLayout";
 import Register from "../Pages/Authentication/Register";
 import ErrorPage from "../Pages/Error/ErrorPage";
+import Contact from "../Pages/Contact/Contact";
 
 export const router = createBrowserRouter([
     {
@@ -13,6 +14,7 @@ export const router = createBrowserRouter([
         errorElement : <ErrorPage></ErrorPage> ,
         children : [
             {index : true , Component : Home},
+            {path:'/contact',Component:Contact}
         ]
     },
     {
