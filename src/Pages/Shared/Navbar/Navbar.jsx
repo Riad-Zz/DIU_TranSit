@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { use } from 'react';
 import { MdArrowOutward } from 'react-icons/md';
 import { Link, NavLink } from 'react-router';
 import Smalllogo from '../../../assets/Logoo.png'
 import { RiMenuFill } from "react-icons/ri";
+import { AuthContext } from '../../../Providers/AuthProvider/AuthProvider';
 
 const Navbar = () => {
     const alllinks = <>
@@ -14,7 +15,16 @@ const Navbar = () => {
         <li className='text-base-content text-[16px] font-bold mb-1'><NavLink to={'/contact'}>Contact</NavLink></li>
     </>
 
-    const user = false;
+    const {user,setUser,logOut} = use(AuthContext) 
+
+    const handleLogOut = () =>{
+        logOut().then(()=>{
+
+        })
+        .catch((error)=>{
+            console.log(error.message)
+        })
+    }
 
     return (
         <div>
@@ -124,9 +134,9 @@ const Navbar = () => {
 
                                             {/* Logout Button */}
                                             <li>
-                                                <button
+                                                <button onClick={handleLogOut}
                                                     // onClick={handleLogOut}
-                                                    className="w-full bg-primary py-2 text-black  flex justify-center font-bold"
+                                                    className="w-full bg-primary py-2 text-white  flex justify-center font-bold"
                                                 >
                                                     Log out
                                                 </button>

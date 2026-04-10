@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import loginImage from "../../assets/logIn.png";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { AuthContext } from "../../Providers/AuthProvider/AuthProvider";
+
 
 const Login = () => {
     const navigate = useNavigate();
@@ -10,8 +12,8 @@ const Login = () => {
     const [eye, setEye] = useState(false);
     const [forget, setforget] = useState(false);
     // const [currentEmail, setCurrentEmail] = useState("");
-    // const { emailLogin, user, setUser, googleLogin, PasswordReset } = use(AuthContext)
-    const { register, handleSubmit, watch, formState: { errors } } = useForm()
+    const {user,setUser,googleLogin} = use(AuthContext)
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const handleEyeClick = (e) => {
         e.preventDefault();
@@ -27,6 +29,19 @@ const Login = () => {
     const handleEmailLogin = (data, e) => {
         console.log(data);
         e.target.reset();
+    }
+
+    // ------------------------ handle Google Login ---------------------------
+    const handleGoogleLogin = ()=>{
+        googleLogin().then((result)=>{
+            const currentUser = result.user ;
+            setUser(currentUser);
+            navigate(location.state || '/') 
+        })
+        .catch((error)=>{
+            const erroeMessage = error.message ;
+            console.log(erroeMessage) ;
+        })
     }
 
     return (
@@ -115,7 +130,7 @@ const Login = () => {
 
                         <p className='text-center font-semibold text-gray-500 mb-4'>OR</p>
 
-                        <button  type='button' className="btn font-bold bg-[#E9ECF1] text-black border border-[#e5e5e5] w-full flex items-center justify-center gap-2 py-3 rounded-lg hover:bg-gray-200 transition">
+                        <button onClick={handleGoogleLogin} type='button' className="btn font-bold bg-[#E9ECF1] text-black border border-[#e5e5e5] w-full flex items-center justify-center gap-2 py-3 rounded-lg hover:bg-gray-200 transition">
                             <svg aria-label="Google logo" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                 <path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path>
                                 <path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path>
