@@ -12,7 +12,7 @@ const Login = () => {
     const [eye, setEye] = useState(false);
     const [forget, setforget] = useState(false);
     // const [currentEmail, setCurrentEmail] = useState("");
-    const {user,setUser,googleLogin} = use(AuthContext)
+    const {user,setUser,googleLogin,emailLogin} = use(AuthContext)
     const { register, handleSubmit, formState: { errors } } = useForm()
 
     const handleEyeClick = (e) => {
@@ -27,8 +27,16 @@ const Login = () => {
 
     //------------------Login With Email and PAssword------------------
     const handleEmailLogin = (data, e) => {
-        console.log(data);
+        // console.log(data);
         e.target.reset();
+        emailLogin(data.email,data.password).then((result)=>{
+            const user = result.user ;
+            setUser(user) ;
+            navigate(location.state || '/');
+        })
+        .catch((error)=>{
+            console.log(error.message) ;
+        })
     }
 
     // ------------------------ handle Google Login ---------------------------
