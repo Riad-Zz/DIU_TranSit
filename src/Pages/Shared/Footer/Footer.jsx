@@ -1,4 +1,7 @@
+import { FaLinkedinIn } from "react-icons/fa";
 import { CiFacebook } from "react-icons/ci";
+import { FaInstagram } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 
 const Footer = () => {
     return (
@@ -42,10 +45,12 @@ const Footer = () => {
                 {/* Social */}
                 <nav>
                     <h6 className="footer-title mb-3 text-white">Follow Us</h6>
-                    <ul className="space-y-2">
-                        <li><a className="link link-hover"><CiFacebook /></a></li>
-                        <li><a className="link link-hover">Twitter</a></li>
-                        <li><a className="link link-hover">Instagram</a></li>
+                    <ul className="space-y-2 flex align-center gap-4 justify-center lg:justify-start">
+                        <li><a className="link link-hover"><FaLinkedinIn className="text-2xl" /></a></li>
+                        <li><a className="link link-hover"><CiFacebook className="text-2xl" /></a></li>
+                        <li><a className="link link-hover"><FaInstagram className="text-2xl" /></a></li>
+                        <li><a className="link link-hover"><FaGithub className="text-2xl" /></a></li>
+                        
                     </ul>
                 </nav>
 
