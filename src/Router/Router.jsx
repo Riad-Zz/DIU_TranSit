@@ -13,6 +13,8 @@ import Schedule from "../Pages/Scedule/Schedule";
 import Loader from "../Componets/Loader/Loader";
 import BusDetails from "../Pages/BusDetails/BusDetails";
 import PrivateRoute from "../Providers/PrivateRoute/PrivateRoute";
+import AdminRoute from "../Providers/AdminRoute/AdminRoute";
+import Forbidden from "../Componets/Forbidden/Forbidden";
 
 export const router = createBrowserRouter([
     {
@@ -25,7 +27,8 @@ export const router = createBrowserRouter([
             {path:'/contact',Component:Contact},
             {path:'/profile',element : <PrivateRoute><Profile></Profile></PrivateRoute>},
             {path :'/schedule',Component : Schedule},
-            {path :'/busdetails/:id' , element:<PrivateRoute><BusDetails></BusDetails></PrivateRoute>}
+            {path :'/busdetails/:id' , element:<PrivateRoute><BusDetails></BusDetails></PrivateRoute>},
+            {path : '/forbidden' , Component:Forbidden},
         ]
     },
     {
@@ -45,7 +48,7 @@ export const router = createBrowserRouter([
         errorElement : <ErrorPage></ErrorPage>,
         hydrateFallbackElement : <Loader></Loader> ,
         children : [
-            {path : '/dashboard' , Component : Overview}
+            {path : '/dashboard' , element : <AdminRoute><Overview></Overview></AdminRoute>}
         ]
     }
 ])
