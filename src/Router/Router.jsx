@@ -10,11 +10,13 @@ import Dashboard from "../Layout/Dashboard/Dashboard";
 import Overview from "../Pages/DashboardPages/Overview/Overview";
 import Profile from "../Pages/Profile/Profile";
 import Schedule from "../Pages/Scedule/Schedule";
+import Loader from "../Componets/Loader/Loader";
 
 export const router = createBrowserRouter([
     {
         path : '/',
         Component : Root,
+        hydrateFallbackElement : <Loader></Loader> ,
         errorElement : <ErrorPage></ErrorPage> ,
         children : [
             {index : true , Component : Home},
@@ -26,6 +28,7 @@ export const router = createBrowserRouter([
     {
         path : '/',
         Component : AuthLayout ,
+        hydrateFallbackElement : <Loader></Loader> ,
         errorElement : <ErrorPage></ErrorPage> ,
         children : [
             {path:'/login' , Component : Login},
@@ -37,6 +40,7 @@ export const router = createBrowserRouter([
         path : '/',
         Component : Dashboard ,
         errorElement : <ErrorPage></ErrorPage>,
+        hydrateFallbackElement : <Loader></Loader> ,
         children : [
             {path : '/dashboard' , Component : Overview}
         ]
