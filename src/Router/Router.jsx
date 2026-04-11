@@ -9,6 +9,7 @@ import Contact from "../Pages/Contact/Contact";
 import Dashboard from "../Layout/Dashboard/Dashboard";
 import Overview from "../Pages/DashboardPages/Overview/Overview";
 import Profile from "../Pages/Profile/Profile";
+import Schedule from "../Pages/Scedule/Schedule";
 
 export const router = createBrowserRouter([
     {
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
             {index : true , Component : Home},
             {path:'/contact',Component:Contact},
             {path:'/profile',Component : Profile},
+            {path :'/schedule',Component : Schedule},
         ]
     },
     {
@@ -27,7 +29,8 @@ export const router = createBrowserRouter([
         errorElement : <ErrorPage></ErrorPage> ,
         children : [
             {path:'/login' , Component : Login},
-            {path : '/register' , Component : Register}
+            {path : '/register' , Component : Register},
+            
         ]
     },
     {
