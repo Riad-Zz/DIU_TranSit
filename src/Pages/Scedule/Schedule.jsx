@@ -9,40 +9,42 @@ const Schedule = () => {
     const [selectedToLocation, setSelectedToLocation] = useState('');
     const [selectedRoute, setSelectedRoute] = useState('');
     const axiosInstance = useAxios();
-    const navigate = useNavigate() ;
+    const navigate = useNavigate();
 
-    const getDayName = (dateString) => {
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const d = new Date(dateString);
-        return days[d.getDay()];
-    };
-
+    // Logic: Pre-calculate all formats for each of the 7 days
     const navDays = useMemo(() => {
         const today = new Date();
         const days = [];
+        const apiDayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const displayDayNames = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
         for (let i = 0; i < 7; i++) {
             const date = new Date(today);
             date.setDate(date.getDate() + i);
-            const dayNames = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+            
+            const dayIdx = date.getDay();
             const dayNum = date.getDate().toString().padStart(2, '0');
             const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+            
             days.push({
-                day: i === 0 ? 'TODAY' : dayNames[date.getDay()],
-                date: `${dayNum} ${month}`,
+                displayDay: i === 0 ? 'TODAY' : displayDayNames[dayIdx],
+                displayDate: `${dayNum} ${month}`,
+                apiDay: apiDayNames[dayIdx], 
                 fullDate: date.toISOString().split('T')[0]
             });
         }
         return days;
     }, []);
 
-    const [selectedDate, setSelectedDate] = useState(navDays[0].fullDate);
+    // Set state to the entire object of the first day
+    const [selectedDayObj, setSelectedDayObj] = useState(navDays[0]);
 
     useEffect(() => {
         const fetchSchedule = async () => {
             setLoading(true);
             try {
-                const dayName = getDayName(selectedDate);
-                const params = { day: dayName };
+                // Use apiDay directly from the selected object
+                const params = { day: selectedDayObj.apiDay };
                 if (selectedFromLocation) params.from = selectedFromLocation;
                 if (selectedToLocation) params.to = selectedToLocation;
 
@@ -55,13 +57,13 @@ const Schedule = () => {
             }
         };
         fetchSchedule();
-    }, [selectedDate, selectedFromLocation, selectedToLocation, axiosInstance]);
+    }, [selectedDayObj, selectedFromLocation, selectedToLocation, axiosInstance]);
 
     const routes = useMemo(() => {
         return dbRoutes.map(r => {
             const uiRoute = {
                 ...r,
-                id : r.id,
+                id: r.id,
                 busid: r.route_id,
                 fromTime: r.from_time,
                 toTime: r.to_time,
@@ -122,9 +124,8 @@ const Schedule = () => {
                 Explore all available bus routes, departure times, and seat availability for incoming and outgoing trips. Select a date to view the full daily schedule.
             </p>
 
-            {/* Filters Section */}
             <div className="w-full max-w-[1100px] bg-gray-200 p-10 mb-6 rounded-2xl">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 rounded">
                     <div>
                         <label className="block text-[#0a2533] font-bold mb-2 text-sm">From Location</label>
                         <select value={selectedFromLocation} onChange={(e) => { setSelectedFromLocation(e.target.value); setSelectedToLocation(''); }} className="w-full px-4 py-3 border-2 rounded-2xl bg-white text-[#0a2533] font-medium outline-none focus:border-[#0a2533]">
@@ -153,20 +154,20 @@ const Schedule = () => {
             </div>
 
             <div className="w-full max-w-[1100px] bg-white shadow-lg flex flex-col relative rounded-2xl overflow-hidden">
-                {/* Sticky Date Nav - Responsive with overflow-x-auto */}
+                {/* Sticky Date Nav - Responsive Fix */}
                 <div className="sticky top-0 z-40 bg-[#0a2533] flex overflow-x-auto no-scrollbar text-white text-center shadow-md">
                     <div className="flex flex-nowrap min-w-full">
                         {navDays.map((item, index) => {
-                            const isActive = item.fullDate === selectedDate;
+                            const isActive = item.fullDate === selectedDayObj.fullDate;
                             return (
                                 <div 
                                     key={index} 
-                                    onClick={() => setSelectedDate(item.fullDate)} 
+                                    onClick={() => setSelectedDayObj(item)} 
                                     className={`flex-1 min-w-[120px] md:min-w-0 p-5 border-r border-white/10 cursor-pointer transition-colors text-sm ${isActive ? 'bg-primary text-white font-bold text-base flex items-center justify-center' : 'text-[#8fa0a8] hover:bg-white/10'}`}
                                 >
                                     <div className="flex flex-col items-center">
-                                        <span>{item.day}</span>
-                                        {!isActive && <span className="block text-[1.1rem] font-bold mt-1.5 text-white">{item.date}</span>}
+                                        <span>{item.displayDay}</span>
+                                        {!isActive && <span className="block text-[1.1rem] font-bold mt-1.5 text-white">{item.displayDate}</span>}
                                     </div>
                                 </div>
                             );
@@ -175,14 +176,13 @@ const Schedule = () => {
                 </div>
 
                 <div className="overflow-x-auto overflow-y-visible">
-                    {/* min-h ensures tooltip has space even if only 1 bus is found */}
+                    {/* Tooltip Padding Logic: min-h ensures the tooltip has space when only 1 bus is found */}
                     <div className={`min-w-[900px] transition-all duration-300 ${filteredRoutes.length === 1 ? 'min-h-[550px]' : 'pb-32'}`}>
                         {loading ? (
-                            <div className="p-12 text-center text-[#8b9a9e] animate-pulse font-bold">Searching routes for {getDayName(selectedDate)}...</div>
+                            <div className="p-12 text-center text-[#8b9a9e] animate-pulse font-bold">Searching routes for {selectedDayObj.apiDay}...</div>
                         ) : filteredRoutes.length > 0 ? (
                             filteredRoutes.map((route, idx) => (
                                 <div key={idx} className="grid grid-cols-[1fr_1.5fr_1fr_1.5fr_1.2fr] items-center bg-[#f5f7f8] m-2.5 p-6 hover:bg-[#ebf0f1] transition-colors relative">
-                                    {/* From */}
                                     <div>
                                         <h3 className="m-0 text-[1.3rem] text-[#0a2533] uppercase flex items-center gap-2 font-bold">
                                             <svg viewBox="0 0 12 16" className="w-[14px] h-[18px] fill-primary"><path d="M6 0C2.68629 0 0 2.68629 0 6C0 10.5 6 16 6 16C6 16 12 10.5 12 6C12 2.68629 9.31371 0 6 0ZM6 3C7.65685 3 9 4.34315 9 6C9 7.65685 7.65685 9 6 9C4.34315 9 3 7.65685 3 6C3 4.34315 4.34315 3 6 3Z" /></svg>
@@ -191,7 +191,6 @@ const Schedule = () => {
                                         <p className="mt-2 ml-[22px] text-[0.9rem] text-[#0a2533] font-medium">{route.fromTime}</p>
                                     </div>
 
-                                    {/* Route Visual & Tooltip */}
                                     <div className="flex items-center justify-center px-5 relative -mt-4 group py-4 cursor-pointer">
                                         <div className="flex-grow border-b-2 border-dotted border-[#b0bcc0] relative group-hover:border-primary transition-colors duration-300">
                                             <div className="absolute -top-[5px] -left-[5px] w-2 h-2 border-2 border-[#b0bcc0] rounded-full bg-[#f5f7f8] group-hover:border-primary transition-colors duration-300"></div>
@@ -199,7 +198,6 @@ const Schedule = () => {
                                             <span className="absolute top-4 left-1/2 -translate-x-1/2 text-xs text-[#8b9a9e] font-bold group-hover:text-[#0a2533] transition-colors duration-300">{route.busid}</span>
                                         </div>
 
-                                        {/* Dropdown Tooltip - Uses high z-index and origin-top */}
                                         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-[#e2e8f0] opacity-0 invisible scale-95 group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all z-50 origin-top pointer-events-none">
                                             <div className="bg-[#0a2533] text-white px-5 py-3 rounded-t-xl font-bold text-sm">Route {route.busid} Stops</div>
                                             <div className="p-5 max-h-[260px] overflow-y-auto">
@@ -216,7 +214,6 @@ const Schedule = () => {
                                         </div>
                                     </div>
 
-                                    {/* To */}
                                     <div>
                                         <h3 className="m-0 text-[1.3rem] text-[#0a2533] uppercase flex items-center gap-2 font-bold">
                                             <svg viewBox="0 0 12 16" className="w-[14px] h-[18px] fill-primary"><path d="M6 0C2.68629 0 0 2.68629 0 6C0 10.5 6 16 6 16C6 16 12 10.5 12 6C12 2.68629 9.31371 0 6 0ZM6 3C7.65685 3 9 4.34315 9 6C9 7.65685 7.65685 9 6 9C4.34315 9 3 7.65685 3 6C3 4.34315 4.34315 3 6 3Z" /></svg>
@@ -225,7 +222,6 @@ const Schedule = () => {
                                         <p className="mt-2 ml-[22px] text-[0.9rem] text-[#0a2533] font-medium">{route.toTime}</p>
                                     </div>
 
-                                    {/* Stats */}
                                     <div className="flex items-center justify-center gap-8">
                                         <div className="flex flex-col">
                                             <div className="text-[1.4rem] font-bold text-[#0a2533]"><span className="text-[1.1rem] mr-1 font-extrabold">৳</span>{route.price}</div>
@@ -239,7 +235,7 @@ const Schedule = () => {
 
                                     <div>
                                         <Link to={`/busdetails/${route.id}`}>
-                                        <button  className="bg-primary py-4 w-full uppercase font-bold text-[0.85rem] rounded-4xl cursor-pointer text-white transition-all hover:shadow-md">Details &rarr;</button>
+                                            <button className="bg-primary py-4 w-full uppercase font-bold text-[0.85rem] rounded-4xl cursor-pointer text-white transition-all hover:shadow-md">Details &rarr;</button>
                                         </Link>
                                     </div>
                                 </div>
