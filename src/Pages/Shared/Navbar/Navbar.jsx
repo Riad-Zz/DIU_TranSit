@@ -19,11 +19,11 @@ const Navbar = () => {
     </>
 
     const { user, setUser, logOut } = use(AuthContext)
-    const navigate = useNavigate() ;
-    const axiosInstance = useAxios() ;
-    const CurrentLoggedInUser = useLoggedInUser(user?.email) ;
+    const navigate = useNavigate();
+    const axiosInstance = useAxios();
+    const CurrentLoggedInUser = useLoggedInUser(user?.email);
     const role = CurrentLoggedInUser.LoggedInUser.role
-    console.log(role) ;
+    console.log(role);
 
 
     // Handle Logout functionality 
@@ -96,7 +96,7 @@ const Navbar = () => {
                                     {/* Dropdown Content */}
                                     <div
                                         tabIndex={0}
-                                        className="dropdown-content z-10 menu p-4 shadow-xl bg-white text-gray-900 rounded-lg mt-5
+                                        className="dropdown-content z-100 menu p-4 shadow-xl bg-white text-gray-900 rounded-lg mt-5
                                w-72 sm:w-80 max-w-[90vw]"
                                     >
                                         {/* Section: Currently In */}
@@ -113,9 +113,9 @@ const Navbar = () => {
 
                                             {/* User Info */}
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex justify-between items-center">
+                                                <div className="flex justify-between items-center flex-wrap">
                                                     <h3 className="font-bold text-lg truncate">{user?.displayName || "User"}</h3>
-                                                    <svg
+                                                    {/* <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         viewBox="0 0 24 24"
                                                         fill="#8FA748"
@@ -126,7 +126,18 @@ const Navbar = () => {
                                                             d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z"
                                                             clipRule="evenodd"
                                                         />
-                                                    </svg>
+                                                    </svg> */}
+                                                    {
+                                                        role == "admin" || role == "student" ?
+                                                            <div className="badge badge-success">
+                                                                <svg className="size-[1em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="currentColor" strokeLinejoin="miter" strokeLinecap="butt"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeLinecap="square" stroke-miterlimit="10" strokeWidth="2"></circle><polyline points="7 13 10 16 17 8" fill="none" stroke="currentColor" strokeLinecap="square" stroke-miterlimit="10" strokeWidth="2"></polyline></g></svg>
+                                                                Varified
+                                                            </div> :
+                                                            <div className="badge badge-warning">
+                                                                <svg className="size-[1em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><g fill="currentColor"><path d="M7.638,3.495L2.213,12.891c-.605,1.048,.151,2.359,1.362,2.359H14.425c1.211,0,1.967-1.31,1.362-2.359L10.362,3.495c-.605-1.048-2.119-1.048-2.724,0Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"></path><line x1="9" y1="6.5" x2="9" y2="10" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"></line><path d="M9,13.569c-.552,0-1-.449-1-1s.448-1,1-1,1,.449,1,1-.448,1-1,1Z" fill="currentColor" data-stroke="none" stroke="none"></path></g></svg>
+                                                                Not-Varified
+                                                            </div>
+                                                    }
                                                 </div>
                                                 <p className="text-gray-600 text-sm">Personal</p>
                                                 <p className="text-gray-400 text-xs mt-1 truncate">
@@ -143,24 +154,24 @@ const Navbar = () => {
                                             </li>
                                             {/* Profile Button  */}
                                             <li>
-                                                <button
-                                                    
+                                                <button onClick={()=>navigate('/profile')}
+
                                                     className="w-full bg-primary py-2 text-white  flex justify-center font-bold"
                                                 >
                                                     Profile
                                                 </button>
                                             </li>
                                             {/* Dashboard Button  */}
-                                            {role=="admin" && 
-                                            <li>
-                                                <button onClick={()=>navigate('/dashboard')}
-                                                    // onClick={handleLogOut}
-                                                    className="w-full bg-slate-800 py-2 text-white  flex justify-center font-bold"
-                                                >
-                                                    Dashboard
-                                                </button>
-                                            </li>
-                                            } 
+                                            {role == "admin" &&
+                                                <li>
+                                                    <button onClick={() => navigate('/dashboard')}
+                                                        // onClick={handleLogOut}
+                                                        className="w-full bg-slate-800 py-2 text-white  flex justify-center font-bold"
+                                                    >
+                                                        Dashboard
+                                                    </button>
+                                                </li>
+                                            }
                                             {/* Logout Button */}
                                             <li>
                                                 <button onClick={handleLogOut}

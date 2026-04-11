@@ -8,6 +8,7 @@ import ErrorPage from "../Pages/Error/ErrorPage";
 import Contact from "../Pages/Contact/Contact";
 import Dashboard from "../Layout/Dashboard/Dashboard";
 import Overview from "../Pages/DashboardPages/Overview/Overview";
+import Profile from "../Pages/Profile/Profile";
 
 export const router = createBrowserRouter([
     {
@@ -16,7 +17,8 @@ export const router = createBrowserRouter([
         errorElement : <ErrorPage></ErrorPage> ,
         children : [
             {index : true , Component : Home},
-            {path:'/contact',Component:Contact}
+            {path:'/contact',Component:Contact},
+            {path:'/profile',Component : Profile},
         ]
     },
     {
