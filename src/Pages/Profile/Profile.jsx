@@ -1,4 +1,4 @@
-import React, { use, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import {
     FaEnvelope, FaUniversity, FaCheckCircle,
     FaExclamationCircle, FaTicketAlt, FaHistory,
@@ -6,10 +6,70 @@ import {
 } from 'react-icons/fa';
 import { MdOutlineVerifiedUser, MdQrCodeScanner, MdSettings } from 'react-icons/md';
 import { AuthContext } from '../../Providers/AuthProvider/AuthProvider';
+import useLoggedInUser from '../../hooks/LoggedInUser/useLoggedInUser';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import useAxios from '../../hooks/Axios/useAxios';
+import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 const Profile = () => {
-    const [isVerified, setIsVerified] = useState(false);
-    const {user} = use(AuthContext)
+    const { user } = use(AuthContext)
+    const CurrentLoggedInUser = useLoggedInUser(user?.email);
+    const role = CurrentLoggedInUser?.LoggedInUser?.role;
+    const logged_id = CurrentLoggedInUser.LoggedInUser.id
+    const modalRef = useRef();
+    const { register, handleSubmit, formState: { errors }, } = useForm();
+    const axiosInstance = useAxios();
+
+
+    const onformSubmit = (data) => {
+        const { email, studentId } = data;
+
+        const emailPattern = new RegExp(`${studentId}@diu\\.edu\\.bd$`);
+
+        if (!emailPattern.test(email)) {
+            toast.warning("Email must match your Student ID (e.g. name" + studentId + "@diu.edu.bd)");
+            modalRef.current.close();
+            toast.error("Student Varification Failed !!!")
+            return;
+        }
+
+        console.log("Valid Data:", data);
+        // close modal after success
+        toast.success("Student Varification Successfull !!!")
+
+        // ------------ New Student Information ------------------ 
+        const varifiedStudent = {
+            studentId: studentId,
+            edu_mail: email,
+            user_id: logged_id
+        }
+
+        const upt = {
+            user_id: logged_id
+        }
+
+        //------------------------Update User role -----------------------
+        axiosInstance.patch('/users',upt)
+        .then((res)=>{
+            console.log(res) ;
+            // setRole('student') ;
+            CurrentLoggedInUser.refetch?.();
+        })
+
+        // ------------------ Post the Varified Student to Database --------------------------
+        axiosInstance.post('/student', varifiedStudent)
+            .then((data) => {
+                if (data.data.id) {
+                    console.log(data.data.id);
+                }
+            })
+        modalRef.current.close();
+    };
+
+    
+
 
     const userData = {
         name: user?.displayName,
@@ -46,7 +106,7 @@ const Profile = () => {
                                 className="relative w-40 h-40 rounded-full object-cover border-4 border-white shadow-xl shadow-slate-200"
                             />
                             <div className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-lg border border-slate-50">
-                                {isVerified ?
+                                {role == "admin" || role == "student" ?
                                     <FaCheckCircle className="text-black text-2xl" /> :
                                     <FaExclamationCircle className="text-amber-500 text-2xl" />
                                 }
@@ -77,9 +137,9 @@ const Profile = () => {
                             </div>
                         </div>
 
-                        {!isVerified ? (
+                        {role !== "admin" && role !== "student" ? (
                             <button
-                                onClick={() => setIsVerified(true)}
+                                onClick={() => modalRef.current.showModal()}
                                 className="mt-10 w-full py-4 px-6 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:shadow-2xl hover:shadow-slate-200 active:scale-95 flex justify-center items-center gap-3"
                             >
                                 <MdOutlineVerifiedUser size={18} /> Verify Identity
@@ -89,6 +149,66 @@ const Profile = () => {
                                 <FaUserShield size={18} /> Verified Account
                             </div>
                         )}
+
+
+                        {/* Modal that will open  */}
+                        <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle">
+                            <div className="modal-box">
+                                <h3 className="font-bold text-lg">Student Verification</h3>
+
+                                <form onSubmit={handleSubmit(onformSubmit)} className="space-y-4 mt-4">
+                                    {/* Student ID */}
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder="Student ID (e.g. 241-15-454)"
+                                            className="input input-bordered w-full outline-none"
+                                            {...register("studentId", {
+                                                required: "Student ID is required",
+                                            })}
+                                        />
+                                        {errors.studentId && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.studentId.message}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Email */}
+                                    <div>
+                                        <input
+                                            type="email"
+                                            placeholder="Student Email (e.g. islam241-15-454@diu.edu.bd)"
+                                            className="input input-bordered w-full outline-none"
+                                            {...register("email", {
+                                                required: "Email is required",
+                                                pattern: {
+                                                    value: /^[a-zA-Z0-9._%+-]+@diu\.edu\.bd$/,
+                                                    message: "Must be a valid DIU email",
+                                                },
+                                            })}
+                                        />
+                                        {errors.email && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.email.message}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Submit */}
+                                    <button className="btn btn-primary w-full text-white">
+                                        Submit Verification
+                                    </button>
+                                </form>
+
+                                {/* Close */}
+                                <div className="modal-action">
+                                    <form method="dialog">
+                                        <button className="btn">Close</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </dialog>
                     </div>
 
                     <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between group cursor-pointer hover:bg-white transition-all">
@@ -114,10 +234,10 @@ const Profile = () => {
                         <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Account Status</p>
                             <div className="flex items-end gap-3">
-                                <p className={`text-4xl font-black tracking-tighter ${isVerified ? 'text-black' : 'text-slate-400'}`}>
-                                    {isVerified ? 'Verified' : 'Unverified'}
+                                <p className={`text-4xl font-black tracking-tighter ${role == "admin" || role == "student" ? 'text-black' : 'text-slate-400'}`}>
+                                    {role == "admin" || role == "student" ? 'Verified' : 'Unverified'}
                                 </p>
-                                <div className={`w-3 h-3 rounded-full mb-2 ${isVerified ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></div>
+                                <div className={`w-3 h-3 rounded-full mb-2 ${role == "admin" || role == "student" ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></div>
                             </div>
                         </div>
 
@@ -159,9 +279,9 @@ const Profile = () => {
                                             <td className="px-8 py-8 text-sm font-bold text-base-content">{row.route}</td>
                                             <td className="px-8 py-8 text-sm font-black text-black text-right">{row.amount}</td>
                                             <td className="px-8 py-8 text-right">
-                                                <span className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-[0.1em] ${row.status === 'Completed'
-                                                        ? 'bg-primary text-white'
-                                                        : 'bg-red-500 text-white'
+                                                <span className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${row.status === 'Completed'
+                                                    ? 'bg-primary text-white'
+                                                    : 'bg-red-500 text-white'
                                                     }`}>
                                                     {row.status}
                                                 </span>

@@ -15,7 +15,7 @@ const useLoggedInUser = (email) => {
             return result.data[0] ;
         }
     })
-    return {LoggedInUser};
+    return {LoggedInUser,refetch};
 };
 
 export default useLoggedInUser;

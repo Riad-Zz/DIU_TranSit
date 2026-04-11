@@ -16,10 +16,10 @@ const Contact = () => {
         <div className='max-w-11/12 xl:max-w-7xl mx-auto my-10'>
             <div className="mb-12 md:mb-20 text-center lg:text-left">
                 <h2 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-none text-base-content">
-                    Say <span className="text-primary italic">Hi!</span>
+                    Contact Transport <span className="text-primary italic">Services</span>
                 </h2>
                 <p className="text-sm md:text-xl opacity-50 mt-4 uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold italic">
-                    Let’s chat about projects, ideas, or just a friendly hello
+                    Need help with routes, schedules, or buses? Let us know
                 </p>
             </div>
 
@@ -29,10 +29,10 @@ const Contact = () => {
                 <div className="space-y-10 md:space-y-12 order-2 lg:order-1">
                     <div className="space-y-4 md:space-y-6 text-center lg:text-left">
                         <h3 className="text-2xl md:text-3xl font-black text-base-content">
-                            Get in Touch
+                            Need a Ride? Contact Us
                         </h3>
                         <p className="text-base md:text-lg opacity-70 leading-relaxed max-w-md mx-auto lg:mx-0 text-base-content">
-                            Open for collaboration, freelance gigs, or just sharing cool ideas!
+                            We're here to assist you with your daily campus transportation needs!
                         </p>
                     </div>
 
@@ -47,7 +47,7 @@ const Contact = () => {
                                     Primary Email
                                 </p>
                                 <p className="text-base md:text-lg font-bold text-base-content break-all">
-                                    islamriad3242@gmail.com
+                                    anisurrahman699@gmail.com
                                 </p>
                             </div>
                         </div>
@@ -64,7 +64,7 @@ const Contact = () => {
                                     href="tel:+8801881463387"
                                     className="text-base md:text-lg font-bold text-base-content hover:text-primary transition-colors"
                                 >
-                                    +8801881463387
+                                    +8801847140037
                                 </a>
                             </div>
                         </div>
@@ -86,9 +86,9 @@ const Contact = () => {
 
                     <div className="flex justify-center lg:justify-start gap-3 md:gap-4">
                         {[
-                            { icon: <FaGithub />, link: "#" },
-                            { icon: <FaLinkedinIn />, link: "#" },
-                            { icon: <FaFacebookF />, link: "#" }
+                            { icon: <FaGithub /> },
+                            { icon: <FaLinkedinIn /> },
+                            { icon: <FaFacebookF /> }
                         ].map((social, i) => (
                             <a
                                 key={i}
