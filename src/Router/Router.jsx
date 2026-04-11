@@ -11,6 +11,7 @@ import Overview from "../Pages/DashboardPages/Overview/Overview";
 import Profile from "../Pages/Profile/Profile";
 import Schedule from "../Pages/Scedule/Schedule";
 import Loader from "../Componets/Loader/Loader";
+import BusDetails from "../Pages/BusDetails/BusDetails";
 
 export const router = createBrowserRouter([
     {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
             {path:'/contact',Component:Contact},
             {path:'/profile',Component : Profile},
             {path :'/schedule',Component : Schedule},
+            {path :'/busdetails/:id' , Component:BusDetails}
         ]
     },
     {

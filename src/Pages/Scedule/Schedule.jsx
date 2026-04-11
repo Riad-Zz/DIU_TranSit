@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import useAxios from '../../hooks/Axios/useAxios';
+import { Link, useNavigate } from 'react-router';
 
 const Schedule = () => {
     const [dbRoutes, setDbRoutes] = useState([]);
@@ -8,6 +9,7 @@ const Schedule = () => {
     const [selectedToLocation, setSelectedToLocation] = useState('');
     const [selectedRoute, setSelectedRoute] = useState('');
     const axiosInstance = useAxios();
+    const navigate = useNavigate() ;
 
     const getDayName = (dateString) => {
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -59,7 +61,8 @@ const Schedule = () => {
         return dbRoutes.map(r => {
             const uiRoute = {
                 ...r,
-                id: r.route_id,
+                id : r.id,
+                busid: r.route_id,
                 fromTime: r.from_time,
                 toTime: r.to_time,
                 price: parseInt(r.price),
@@ -193,12 +196,12 @@ const Schedule = () => {
                                         <div className="flex-grow border-b-2 border-dotted border-[#b0bcc0] relative group-hover:border-primary transition-colors duration-300">
                                             <div className="absolute -top-[5px] -left-[5px] w-2 h-2 border-2 border-[#b0bcc0] rounded-full bg-[#f5f7f8] group-hover:border-primary transition-colors duration-300"></div>
                                             <div className="absolute -top-[5px] -right-[5px] w-2 h-2 border-2 border-[#b0bcc0] rounded-full bg-[#f5f7f8] group-hover:border-primary transition-colors duration-300"></div>
-                                            <span className="absolute top-4 left-1/2 -translate-x-1/2 text-xs text-[#8b9a9e] font-bold group-hover:text-[#0a2533] transition-colors duration-300">{route.id}</span>
+                                            <span className="absolute top-4 left-1/2 -translate-x-1/2 text-xs text-[#8b9a9e] font-bold group-hover:text-[#0a2533] transition-colors duration-300">{route.busid}</span>
                                         </div>
 
                                         {/* Dropdown Tooltip - Uses high z-index and origin-top */}
                                         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-[#e2e8f0] opacity-0 invisible scale-95 group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all z-50 origin-top pointer-events-none">
-                                            <div className="bg-[#0a2533] text-white px-5 py-3 rounded-t-xl font-bold text-sm">Route {route.id} Stops</div>
+                                            <div className="bg-[#0a2533] text-white px-5 py-3 rounded-t-xl font-bold text-sm">Route {route.busid} Stops</div>
                                             <div className="p-5 max-h-[260px] overflow-y-auto">
                                                 <div className="relative border-l-2 border-primary ml-2 space-y-4">
                                                     {route.stopsList.map((stop, i) => (
@@ -235,7 +238,9 @@ const Schedule = () => {
                                     </div>
 
                                     <div>
-                                        <button className="bg-primary py-4 w-full uppercase font-bold text-[0.85rem] rounded-4xl cursor-pointer text-white transition-all hover:shadow-md">BUY TICKETS &rarr;</button>
+                                        <Link to={`/busdetails/${route.id}`}>
+                                        <button  className="bg-primary py-4 w-full uppercase font-bold text-[0.85rem] rounded-4xl cursor-pointer text-white transition-all hover:shadow-md">BUY TICKETS &rarr;</button>
+                                        </Link>
                                     </div>
                                 </div>
                             ))
