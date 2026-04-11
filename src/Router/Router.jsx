@@ -12,6 +12,7 @@ import Profile from "../Pages/Profile/Profile";
 import Schedule from "../Pages/Scedule/Schedule";
 import Loader from "../Componets/Loader/Loader";
 import BusDetails from "../Pages/BusDetails/BusDetails";
+import PrivateRoute from "../Providers/PrivateRoute/PrivateRoute";
 
 export const router = createBrowserRouter([
     {
@@ -22,9 +23,9 @@ export const router = createBrowserRouter([
         children : [
             {index : true , Component : Home},
             {path:'/contact',Component:Contact},
-            {path:'/profile',Component : Profile},
+            {path:'/profile',element : <PrivateRoute><Profile></Profile></PrivateRoute>},
             {path :'/schedule',Component : Schedule},
-            {path :'/busdetails/:id' , Component:BusDetails}
+            {path :'/busdetails/:id' , element:<PrivateRoute><BusDetails></BusDetails></PrivateRoute>}
         ]
     },
     {

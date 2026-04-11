@@ -239,7 +239,7 @@ const Schedule = () => {
 
                                     <div>
                                         <Link to={`/busdetails/${route.id}`}>
-                                        <button  className="bg-primary py-4 w-full uppercase font-bold text-[0.85rem] rounded-4xl cursor-pointer text-white transition-all hover:shadow-md">BUY TICKETS &rarr;</button>
+                                        <button  className="bg-primary py-4 w-full uppercase font-bold text-[0.85rem] rounded-4xl cursor-pointer text-white transition-all hover:shadow-md">Details &rarr;</button>
                                         </Link>
                                     </div>
                                 </div>
