@@ -1,9 +1,12 @@
 import React, { use } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { MdArrowOutward } from 'react-icons/md';
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
 import Smalllogo from '../../../assets/Logoo.png'
 import { RiMenuFill } from "react-icons/ri";
 import { AuthContext } from '../../../Providers/AuthProvider/AuthProvider';
+import useAxios from '../../../hooks/Axios/useAxios';
+import useLoggedInUser from '../../../hooks/LoggedInUser/useLoggedInUser';
 
 const Navbar = () => {
     const alllinks = <>
@@ -15,15 +18,22 @@ const Navbar = () => {
         <li className='text-base-content text-[16px] font-bold mb-1'><NavLink to={'/contact'}>Contact</NavLink></li>
     </>
 
-    const {user,setUser,logOut} = use(AuthContext) 
+    const { user, setUser, logOut } = use(AuthContext)
+    const navigate = useNavigate() ;
+    const axiosInstance = useAxios() ;
+    const CurrentLoggedInUser = useLoggedInUser(user?.email) ;
+    const role = CurrentLoggedInUser.LoggedInUser.role
+    console.log(role) ;
 
-    const handleLogOut = () =>{
-        logOut().then(()=>{
+
+    // Handle Logout functionality 
+    const handleLogOut = () => {
+        logOut().then(() => {
 
         })
-        .catch((error)=>{
-            console.log(error.message)
-        })
+            .catch((error) => {
+                console.log(error.message)
+            })
     }
 
     return (
@@ -131,16 +141,36 @@ const Navbar = () => {
                                             <li className="px-4 py-1 text-xs text-gray-500 font-normal uppercase tracking-wide">
                                                 Your accounts
                                             </li>
-
+                                            {/* Profile Button  */}
+                                            <li>
+                                                <button
+                                                    
+                                                    className="w-full bg-primary py-2 text-white  flex justify-center font-bold"
+                                                >
+                                                    Profile
+                                                </button>
+                                            </li>
+                                            {/* Dashboard Button  */}
+                                            {role=="admin" && 
+                                            <li>
+                                                <button onClick={()=>navigate('/dashboard')}
+                                                    // onClick={handleLogOut}
+                                                    className="w-full bg-slate-800 py-2 text-white  flex justify-center font-bold"
+                                                >
+                                                    Dashboard
+                                                </button>
+                                            </li>
+                                            } 
                                             {/* Logout Button */}
                                             <li>
                                                 <button onClick={handleLogOut}
                                                     // onClick={handleLogOut}
-                                                    className="w-full bg-primary py-2 text-white  flex justify-center font-bold"
+                                                    className="w-full bg-red-100 py-2 text-red-900  flex justify-center font-bold"
                                                 >
                                                     Log out
                                                 </button>
                                             </li>
+
                                         </ul>
                                     </div>
                                 </div>

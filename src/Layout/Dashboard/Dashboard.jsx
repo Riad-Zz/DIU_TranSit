@@ -22,7 +22,7 @@ import { PiStudentDuotone } from "react-icons/pi";
 const Dashboard = () => {
     const { user } = use(AuthContext)
     const [isOpen, setIsOpen] = useState(false);
-    console.log(user) ;
+    // console.log(user) ;
 
     useEffect(() => {
         if (window.innerWidth >= 768) {
@@ -76,7 +76,7 @@ const Dashboard = () => {
                     {/*------------------Sidebar content here-----------------------*/}
                     <ul className="menu w-full grow dashlink">
                         {/* ------------ Logo -> when Extended ------------------*/}
-                        <Link to={'/'} className='flex items-center gap-2 pl-3 p-1 w-full  is-drawer-close:hidden'>
+                        <Link to={'/'} className='flex items-center gap-2 pl-3 pt-15 pb-2 md:p-1 w-full  is-drawer-close:hidden'>
                             <img src={logoo} alt="" className='h-15'/> <span className='text-xl font-bold'>RouteSync</span> 
                         </Link>
                         {/* ------------ Logo -> when not Extended ------------------*/}
