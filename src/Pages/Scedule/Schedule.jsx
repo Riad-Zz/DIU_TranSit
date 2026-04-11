@@ -35,7 +35,6 @@ const Schedule = () => {
 
     const [selectedDate, setSelectedDate] = useState(navDays[0].fullDate);
 
-    // 1. Fetch from API whenever Date, From, or To locations change using Axios
     useEffect(() => {
         const fetchSchedule = async () => {
             setLoading(true);
@@ -56,8 +55,6 @@ const Schedule = () => {
         fetchSchedule();
     }, [selectedDate, selectedFromLocation, selectedToLocation, axiosInstance]);
 
-
-    // 2. Transform API data for UI (Stop Calculation)
     const routes = useMemo(() => {
         return dbRoutes.map(r => {
             const uiRoute = {
@@ -83,8 +80,6 @@ const Schedule = () => {
         });
     }, [dbRoutes]);
 
-
-    // 3. MASTER STOPS LOGIC: Handles sequential filtering
     const fromLocations = useMemo(() => {
         const stops = new Set();
         dbRoutes.forEach(r => {
@@ -99,7 +94,6 @@ const Schedule = () => {
             if (r.stops_str) {
                 const stopArray = r.stops_str.split(', ');
                 if (selectedFromLocation) {
-                    // Only add stops that appear AFTER the selected From Location
                     const fromIdx = stopArray.indexOf(selectedFromLocation);
                     if (fromIdx !== -1) {
                         stopArray.slice(fromIdx + 1).forEach(s => stops.add(s));
@@ -126,25 +120,25 @@ const Schedule = () => {
             </p>
 
             {/* Filters Section */}
-            <div className="w-full max-w-[1100px] bg-gray-200  p-10  mb-6 rounded-2xl">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 rounded">
+            <div className="w-full max-w-[1100px] bg-gray-200 p-10 mb-6 rounded-2xl">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label className="block text-[#0a2533] font-bold mb-2 text-sm">From Location</label>
-                        <select value={selectedFromLocation} onChange={(e) => { setSelectedFromLocation(e.target.value); setSelectedToLocation(''); }} className="w-full px-4 py-3 border-2  rounded-2xl bg-white text-[#0a2533] font-medium outline-none focus:border-[#0a2533]">
+                        <select value={selectedFromLocation} onChange={(e) => { setSelectedFromLocation(e.target.value); setSelectedToLocation(''); }} className="w-full px-4 py-3 border-2 rounded-2xl bg-white text-[#0a2533] font-medium outline-none focus:border-[#0a2533]">
                             <option value="">All Locations</option>
                             {fromLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
                         </select>
                     </div>
                     <div>
                         <label className="block text-[#0a2533] font-bold mb-2 text-sm">To Location</label>
-                        <select value={selectedToLocation} onChange={(e) => setSelectedToLocation(e.target.value)} className="w-full px-4 py-3 border-2 rounded-2xl  bg-white text-[#0a2533] font-medium outline-none focus:border-[#0a2533]">
+                        <select value={selectedToLocation} onChange={(e) => setSelectedToLocation(e.target.value)} className="w-full px-4 py-3 border-2 rounded-2xl bg-white text-[#0a2533] font-medium outline-none focus:border-[#0a2533]">
                             <option value="">All Locations</option>
                             {toLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
                         </select>
                     </div>
                     <div>
                         <label className="block text-[#0a2533] font-bold mb-2 text-sm">Route</label>
-                        <select value={selectedRoute} onChange={(e) => setSelectedRoute(e.target.value)} className="w-full px-4 py-3 border-2  rounded-2xl  bg-white text-[#0a2533] font-medium outline-none focus:border-[#0a2533]">
+                        <select value={selectedRoute} onChange={(e) => setSelectedRoute(e.target.value)} className="w-full px-4 py-3 border-2 rounded-2xl bg-white text-[#0a2533] font-medium outline-none focus:border-[#0a2533]">
                             <option value="">All Routes</option>
                             {routeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                         </select>
@@ -155,24 +149,31 @@ const Schedule = () => {
                 )}
             </div>
 
-            <div className="w-full max-w-[1100px] bg-white shadow-lg flex flex-col relative">
-                {/* Sticky Date Nav */}
-                <div className="sticky top-0 z-40 bg-[#0a2533] flex text-white text-center shadow-md">
-                    {navDays.map((item, index) => {
-                        const isActive = item.fullDate === selectedDate;
-                        return (
-                            <div key={index} onClick={() => setSelectedDate(item.fullDate)} className={`flex-1 p-5 border-r border-white/10 cursor-pointer transition-colors text-sm ${isActive ? 'bg-primary text-white font-bold text-base flex items-center justify-center' : 'text-[#8fa0a8] hover:bg-white/10'}`}>
-                                <div className="flex flex-col items-center">
-                                    <span>{item.day}</span>
-                                    {!isActive && <span className="block text-[1.1rem] font-bold mt-1.5 text-white">{item.date}</span>}
+            <div className="w-full max-w-[1100px] bg-white shadow-lg flex flex-col relative rounded-2xl overflow-hidden">
+                {/* Sticky Date Nav - Responsive with overflow-x-auto */}
+                <div className="sticky top-0 z-40 bg-[#0a2533] flex overflow-x-auto no-scrollbar text-white text-center shadow-md">
+                    <div className="flex flex-nowrap min-w-full">
+                        {navDays.map((item, index) => {
+                            const isActive = item.fullDate === selectedDate;
+                            return (
+                                <div 
+                                    key={index} 
+                                    onClick={() => setSelectedDate(item.fullDate)} 
+                                    className={`flex-1 min-w-[120px] md:min-w-0 p-5 border-r border-white/10 cursor-pointer transition-colors text-sm ${isActive ? 'bg-primary text-white font-bold text-base flex items-center justify-center' : 'text-[#8fa0a8] hover:bg-white/10'}`}
+                                >
+                                    <div className="flex flex-col items-center">
+                                        <span>{item.day}</span>
+                                        {!isActive && <span className="block text-[1.1rem] font-bold mt-1.5 text-white">{item.date}</span>}
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <div className="min-w-[900px] pb-32">
+                <div className="overflow-x-auto overflow-y-visible">
+                    {/* min-h ensures tooltip has space even if only 1 bus is found */}
+                    <div className={`min-w-[900px] transition-all duration-300 ${filteredRoutes.length === 1 ? 'min-h-[550px]' : 'pb-32'}`}>
                         {loading ? (
                             <div className="p-12 text-center text-[#8b9a9e] animate-pulse font-bold">Searching routes for {getDayName(selectedDate)}...</div>
                         ) : filteredRoutes.length > 0 ? (
@@ -191,11 +192,12 @@ const Schedule = () => {
                                     <div className="flex items-center justify-center px-5 relative -mt-4 group py-4 cursor-pointer">
                                         <div className="flex-grow border-b-2 border-dotted border-[#b0bcc0] relative group-hover:border-primary transition-colors duration-300">
                                             <div className="absolute -top-[5px] -left-[5px] w-2 h-2 border-2 border-[#b0bcc0] rounded-full bg-[#f5f7f8] group-hover:border-primary transition-colors duration-300"></div>
-                                            <div className="absolute -top-[5px] -right-[5px] w-2 h-2 border-2 border-[#b0bcc0] rounded-full bg-[#f5f7f8] group-hover:border-primarytransition-colors duration-300"></div>
+                                            <div className="absolute -top-[5px] -right-[5px] w-2 h-2 border-2 border-[#b0bcc0] rounded-full bg-[#f5f7f8] group-hover:border-primary transition-colors duration-300"></div>
                                             <span className="absolute top-4 left-1/2 -translate-x-1/2 text-xs text-[#8b9a9e] font-bold group-hover:text-[#0a2533] transition-colors duration-300">{route.id}</span>
                                         </div>
 
-                                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-[#e2e8f0] opacity-0 invisible scale-95 group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all z-50 origin-top">
+                                        {/* Dropdown Tooltip - Uses high z-index and origin-top */}
+                                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-[#e2e8f0] opacity-0 invisible scale-95 group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all z-50 origin-top pointer-events-none">
                                             <div className="bg-[#0a2533] text-white px-5 py-3 rounded-t-xl font-bold text-sm">Route {route.id} Stops</div>
                                             <div className="p-5 max-h-[260px] overflow-y-auto">
                                                 <div className="relative border-l-2 border-primary ml-2 space-y-4">
@@ -238,7 +240,7 @@ const Schedule = () => {
                                 </div>
                             ))
                         ) : (
-                            <div className="p-12 text-center text-[#8b9a9e] text-lg font-medium">No results found for your search criteria.</div>
+                            <div className="p-12 text-center text-[#8b9a9e] text-lg font-medium italic">No routes found for your search criteria.</div>
                         )}
                     </div>
                 </div>
