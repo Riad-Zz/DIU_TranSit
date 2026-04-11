@@ -109,10 +109,10 @@ const Schedule = () => {
         return [...stops].sort();
     }, [dbRoutes, selectedFromLocation]);
 
-    const routeOptions = useMemo(() => [...new Set(routes.map(r => r.id?.split('-')[0]))].filter(Boolean).sort(), [routes]);
+    const routeOptions = useMemo(() => [...new Set(routes.map(r => r.busid?.split('-')[0]))].filter(Boolean).sort(), [routes]);
 
     const filteredRoutes = useMemo(() => {
-        return routes.filter(route => !selectedRoute || route.id.startsWith(selectedRoute));
+        return routes.filter(route => !selectedRoute || route.busid.startsWith(selectedRoute));
     }, [selectedRoute, routes]);
 
     return (
