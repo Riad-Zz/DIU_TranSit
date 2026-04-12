@@ -35,21 +35,36 @@ const Profile = () => {
             return;
         }
 
-        // --- SUCCESS FLOW ---
-        toast.success("Student Verification Successful !!!");
+        const varifiedStudent = {
+            studentId,
+            edu_mail: email,
+            user_id: logged_id
+        };
 
-        const varifiedStudent = { studentId, edu_mail: email, user_id: logged_id };
         const upt = { user_id: logged_id };
 
-        axiosInstance.patch('/users', upt).then(() => {
-            CurrentLoggedInUser.refetch?.();
-        });
+        axiosInstance.post('/student', varifiedStudent)
+            .then(() => {
+                toast.success("Student Verification Successful !!!");
 
-        axiosInstance.post('/student', varifiedStudent);
+                axiosInstance.patch('/users', upt).then(() => {
+                    CurrentLoggedInUser.refetch?.();
+                });
 
-        setTimeout(() => {
-            modalRef.current?.close();
-        }, 150);
+                setTimeout(() => {
+                    modalRef.current?.close();
+                }, 150);
+            })
+            .catch((err) => {
+                if (err.response?.data?.message) {
+                    toast.error(err.response.data.message);
+                    modalRef.current?.close();
+
+                } else {
+                    toast.error("Duplicate student ID or email");
+                    modalRef.current?.close();
+                }
+            });
     };
 
 
