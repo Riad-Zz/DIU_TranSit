@@ -19,6 +19,7 @@ import TransportCardApply from "../Pages/CardApply/TransportCardApply";
 import Manage from "../Pages/DashboardPages/Manage/Manage";
 import StudentRoute from "../Providers/StudentRoute/StudentRoute";
 import VarifyError from "../Componets/VarifyError/VarifyError";
+import CardManagement from "../Pages/DashboardPages/CardManagement/CardManagement";
 
 export const router = createBrowserRouter([
     {
@@ -55,7 +56,8 @@ export const router = createBrowserRouter([
         hydrateFallbackElement : <Loader></Loader> ,
         children : [
             {path : '/dashboard' , element : <AdminRoute><Overview></Overview></AdminRoute>},
-            {path :'/manage',element : <AdminRoute><Manage></Manage></AdminRoute>}
+            {path :'/manage',element : <AdminRoute><Manage></Manage></AdminRoute>},
+            {path :'/cardrequest' , element : <AdminRoute><CardManagement></CardManagement></AdminRoute>}
         ]
     }
 ])
