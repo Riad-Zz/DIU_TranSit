@@ -9,6 +9,7 @@ import useLoggedInUser from '../../hooks/LoggedInUser/useLoggedInUser';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import useAxios from '../../hooks/Axios/useAxios';
+import { useQuery } from '@tanstack/react-query';
 
 // --- STYLING CONSTANTS ---
 const inputStyle = "w-full bg-gray-100 border-none rounded-xl p-4 text-[#0a2533] font-bold italic uppercase tracking-wider text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:opacity-30";
@@ -19,9 +20,23 @@ const Profile = () => {
     const CurrentLoggedInUser = useLoggedInUser(user?.email);
     const role = CurrentLoggedInUser?.LoggedInUser?.role;
     const logged_id = CurrentLoggedInUser.LoggedInUser?.id;
+    const currentid = CurrentLoggedInUser.LoggedInUser?.id;
     const modalRef = useRef();
     const { register, handleSubmit, formState: { errors } } = useForm();
     const axiosInstance = useAxios();
+    
+    const { data: currentStudentData = [], refetch } = useQuery({
+        queryKey: ["currentStudent", currentid],
+        queryFn: async () => {
+            const res = await axiosInstance.get(`student/${currentid}`);
+            return res.data;
+        },
+        enabled: !!currentid,
+    });
+
+    const card_stat = currentStudentData[0]?.card_status;
+    const student_email = currentStudentData[0]?.edu_mail;
+    // console.log(card_stat,student_email) ;
 
     const onformSubmit = (data) => {
         const { email, studentId } = data;
@@ -71,7 +86,7 @@ const Profile = () => {
     const userData = {
         name: user?.displayName,
         email: user?.email,
-        eduMail: "tohidul.cse@daffodil.edu",
+        eduMail: student_email ?student_email : " ",
         studentStatus: "2nd Year, CSE",
         location: "Dhaka, Bangladesh",
         image: user?.photoURL
@@ -182,8 +197,8 @@ const Profile = () => {
 
                         <div className="bg-[#0a2533] p-8 rounded-3xl shadow-2xl flex flex-col justify-between group overflow-hidden relative">
                             <FaTicketAlt className="absolute -right-6 -bottom-6 text-white/5 text-9xl rotate-12 group-hover:scale-110 transition-transform" />
-                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4 italic">Available Tokens</p>
-                            <p className="text-5xl font-black italic tracking-tighter text-white relative z-10">12 UNITS</p>
+                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4 italic">Transpot Card Status</p>
+                            <p className="text-5xl font-black italic tracking-tighter text-white relative z-10">{card_stat}</p>
                         </div>
                     </div>
 
