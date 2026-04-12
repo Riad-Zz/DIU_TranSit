@@ -117,11 +117,11 @@ const Dashboard = () => {
                         {/* =================== List item - 04 =========================*/}
                         <li className='mt-3'>
                             <NavLink
-                                to="/users"
+                                to="/manage"
                                 className="flex items-center is-drawer-close:tooltip is-drawer-close:tooltip-right "
-                                data-tip="Client" >
+                                data-tip="Manage" >
                                 <PiStudentDuotone className='is-drawer-open:text-xl'></PiStudentDuotone>
-                                <span className="is-drawer-close:hidden text-black block">Client</span>
+                                <span className="is-drawer-close:hidden text-black block">Manage</span>
                             </NavLink>
                         </li>
 

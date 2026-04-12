@@ -16,6 +16,7 @@ import PrivateRoute from "../Providers/PrivateRoute/PrivateRoute";
 import AdminRoute from "../Providers/AdminRoute/AdminRoute";
 import Forbidden from "../Componets/Forbidden/Forbidden";
 import TransportCardApply from "../Pages/CardApply/TransportCardApply";
+import Manage from "../Pages/DashboardPages/Manage/Manage";
 
 export const router = createBrowserRouter([
     {
@@ -50,7 +51,8 @@ export const router = createBrowserRouter([
         errorElement : <ErrorPage></ErrorPage>,
         hydrateFallbackElement : <Loader></Loader> ,
         children : [
-            {path : '/dashboard' , element : <AdminRoute><Overview></Overview></AdminRoute>}
+            {path : '/dashboard' , element : <AdminRoute><Overview></Overview></AdminRoute>},
+            {path :'/manage',element : <AdminRoute><Manage></Manage></AdminRoute>}
         ]
     }
 ])
