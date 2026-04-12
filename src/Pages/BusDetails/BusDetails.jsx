@@ -1,22 +1,21 @@
-import React, { useState, useMemo } from 'react';
+import React, { use, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import {
-    MapPin,
-    Clock,
-    Users,
-    ShieldCheck,
-    ChevronLeft,
-    Wifi,
-    Plug
-} from 'lucide-react';
+import {MapPin,Clock,Users,ShieldCheck,ChevronLeft,Wifi,Plug} from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import useAxios from '../../hooks/Axios/useAxios';
 import Loader from '../../Componets/Loader/Loader';
+import { AuthContext } from '../../Providers/AuthProvider/AuthProvider';
+import useLoggedInUser from '../../hooks/LoggedInUser/useLoggedInUser';
 
 const BusDetails = () => {
     const { id } = useParams();
     const axiosInstance = useAxios();
     const navigate = useNavigate();
+
+    
+    const { user } = use(AuthContext);
+    const { LoggedInUser } = useLoggedInUser(user?.email);
+    const currentUserId = LoggedInUser?.id;
 
     // CENTRALIZED COLOR PALETTE
     const colors = {
@@ -31,7 +30,8 @@ const BusDetails = () => {
         border: '#E5E7EB'         // Neutral-200
     };
 
-    const { data: busData = [], isLoading } = useQuery({
+    // ------------- FETCH BUS DATA -----------------
+    const { data: busData = [], isLoading: busLoading } = useQuery({
         queryKey: ['bus', id],
         queryFn: async () => {
             const res = await axiosInstance.get(`/busses/${id}`);
@@ -40,6 +40,17 @@ const BusDetails = () => {
         enabled: !!id,
     });
 
+    // ----------- FECH STUDENT STATUS USING USER ID ---------------------
+    const { data: studentRecord = [], isLoading: studentLoading } = useQuery({
+        queryKey: ['studentStatus', currentUserId],
+        queryFn: async () => {
+            const res = await axiosInstance.get(`/student/${currentUserId}`);
+            return res.data;
+        },
+        enabled: !!currentUserId,
+    });
+
+    const isCardActive = studentRecord[0]?.card_status === 'active';
     const bus = busData[0] || {};
 
     const journeyData = useMemo(() => {
@@ -69,7 +80,7 @@ const BusDetails = () => {
         };
     }, [bus]);
 
-    if (isLoading) return <Loader />;
+    if (busLoading || studentLoading) return <Loader />;
 
     if (!journeyData) {
         return (
@@ -83,7 +94,7 @@ const BusDetails = () => {
         <div className="min-h-screen bg-white py-12 px-4 font-sans" style={{ color: colors.text }}>
             <div className="max-w-6xl mx-auto">
 
-                {/* --- HEADER SECTION (UNTOUCHED TEXT) --- */}
+                {/* --- HEADER SECTION --- */}
                 <div className="mb-12 text-center md:text-left">
                     <button
                         onClick={() => navigate(-1)}
@@ -108,7 +119,7 @@ const BusDetails = () => {
                     <div className="lg:col-span-8 space-y-6">
 
                         {/* Card 1: Route Details */}
-                        <div 
+                        <div
                             className="p-8 md:p-12 rounded-2xl border shadow-sm"
                             style={{ backgroundColor: colors.bgLight, borderColor: colors.border }}
                         >
@@ -129,26 +140,28 @@ const BusDetails = () => {
                                 </div>
                                 <div className="md:text-right">
                                     <p className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-30">Ticket Fare</p>
-                                    <div className="text-5xl font-black tracking-tighter italic" style={{ color: colors.primary }}>৳{journeyData.price}</div>
+                                    <div className="text-5xl font-black tracking-tighter italic" style={{ color: colors.primary }}>
+                                        {isCardActive ? "FREE" : `৳${journeyData.price}`}
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t" style={{ borderColor: colors.border }}>
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[9px] uppercase font-black tracking-widest opacity-40 flex items-center gap-2">
-                                        <Clock size={12}/> Departure
+                                        <Clock size={12} /> Departure
                                     </span>
                                     <span className="font-black text-xl italic">{journeyData.startTimeFormatted}</span>
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[9px] uppercase font-black tracking-widest opacity-40 flex items-center gap-2">
-                                        <Users size={12}/> Availability
+                                        <Users size={12} /> Availability
                                     </span>
                                     <span className="font-black text-xl italic">{journeyData.seats} Seats</span>
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[9px] uppercase font-black tracking-widest opacity-40 flex items-center gap-2">
-                                        <MapPin size={12}/> Schedule
+                                        <MapPin size={12} /> Schedule
                                     </span>
                                     <span className="font-black text-xl italic" style={{ color: colors.primary }}>{journeyData.day}</span>
                                 </div>
@@ -156,7 +169,7 @@ const BusDetails = () => {
                         </div>
 
                         {/* Card 2: Station Roadmap */}
-                        <div 
+                        <div
                             className="p-8 md:p-12 rounded-2xl border shadow-sm"
                             style={{ backgroundColor: colors.bgLight, borderColor: colors.border }}
                         >
@@ -166,19 +179,18 @@ const BusDetails = () => {
                                 </div>
                                 Roadmap Details
                             </h2>
-                            
-                            
+
                             <div className="relative border-l-2 ml-4 space-y-12" style={{ borderColor: colors.slate }}>
                                 <div className="relative pl-10">
-                                    <div 
+                                    <div
                                         className="absolute -left-[9px]  top-1 w-4 h-4 rounded-full ring-4 ring-white shadow-sm"
                                         style={{ backgroundColor: colors.primary }}
                                     ></div>
                                     <div className="flex justify-between items-start">
                                         <span className="font-black  text-2xl uppercase tracking-tighter">{journeyData.from}</span>
-                                        <span 
+                                        <span
                                             className="text-[10px] font-black px-2 py-0.5 rounded bg-gray-200"
-                                            style={{ color: colors.primary}}
+                                            style={{ color: colors.primary }}
                                         >
                                             {journeyData.startTimeFormatted}
                                         </span>
@@ -187,7 +199,7 @@ const BusDetails = () => {
 
                                 {journeyData.intermediateStops.map((stop, index) => (
                                     <div key={index} className="relative pl-10 group">
-                                        <div 
+                                        <div
                                             className="absolute -left-[5px] top-2 w-2 h-2 rounded-full ring-2 ring-white transition-colors"
                                             style={{ backgroundColor: colors.slate }}
                                         ></div>
@@ -199,7 +211,7 @@ const BusDetails = () => {
                                 ))}
 
                                 <div className="relative pl-10">
-                                    <div 
+                                    <div
                                         className="absolute -left-[9px] top-1 w-4 h-4 rounded-full ring-4 ring-white shadow-sm"
                                         style={{ backgroundColor: colors.text }}
                                     ></div>
@@ -219,7 +231,9 @@ const BusDetails = () => {
                             <div className="space-y-6 mb-10">
                                 <div className="flex justify-between items-end border-b border-white/10 pb-4">
                                     <span className="text-white/40 text-[9px] font-black uppercase tracking-widest">Student Pass</span>
-                                    <span className="text-white font-black italic text-sm uppercase tracking-tight">Active ID</span>
+                                    <span className={`font-black italic text-sm uppercase tracking-tight ${isCardActive ? 'text-emerald-400' : 'text-white'}`}>
+                                        {isCardActive ? 'Active Card' : 'Standard ID'}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between items-end border-b border-white/10 pb-4">
                                     <span className="text-white/40 text-[9px] font-black uppercase tracking-widest">Route Type</span>
@@ -227,11 +241,13 @@ const BusDetails = () => {
                                 </div>
                                 <div className="pt-4 flex flex-col">
                                     <p className="text-primary font-black uppercase text-[10px] tracking-widest mb-2">Total Payable</p>
-                                    <span className="text-5xl font-black tracking-tighter italic">৳{journeyData.price}</span>
+                                    <span className="text-5xl font-black tracking-tighter italic">
+                                        {isCardActive ? "FREE" : `৳${journeyData.price}`}
+                                    </span>
                                 </div>
                             </div>
-                            <button className="w-full bg-emerald-600 text-white font-black uppercase py-5 rounded-xl tracking-[4px] text-xs hover:bg-emerald-500 transition-all active:scale-95 shadow-lg shadow-emerald-900/40">
-                                Confirm & Reserve
+                            <button className={`w-full text-white font-black uppercase py-5 rounded-xl tracking-[4px] text-xs transition-all active:scale-95 shadow-lg shadow-emerald-900/40 ${isCardActive ? 'bg-primary hover:bg-green-600' : 'bg-emerald-600 hover:bg-emerald-500'}`}>
+                                {isCardActive ? 'Reserve Seat (Free)' : 'Confirm & Reserve'}
                             </button>
                             <div className="mt-12 space-y-4 border-t border-white/10 pt-8">
                                 <div className="flex items-center gap-4 text-white/60">
@@ -245,7 +261,7 @@ const BusDetails = () => {
                             </div>
                         </div>
 
-                        <div 
+                        <div
                             className="p-8 text-center border rounded-2xl shadow-sm"
                             style={{ backgroundColor: colors.bgLight, borderColor: colors.border }}
                         >
