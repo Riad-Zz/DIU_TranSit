@@ -5,8 +5,8 @@ import { AuthContext } from '../../Providers/AuthProvider/AuthProvider';
 
 
 const axiosInstance = axios.create({
-    // baseURL : `https://diutransitserver.vercel.app`
-    baseURL : `http://localhost:3000`
+    baseURL : `https://diutransitserver.vercel.app`
+    // baseURL : `http://localhost:3000`
 });
 
 const useAxios = () => {
