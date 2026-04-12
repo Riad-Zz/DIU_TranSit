@@ -15,6 +15,7 @@ import BusDetails from "../Pages/BusDetails/BusDetails";
 import PrivateRoute from "../Providers/PrivateRoute/PrivateRoute";
 import AdminRoute from "../Providers/AdminRoute/AdminRoute";
 import Forbidden from "../Componets/Forbidden/Forbidden";
+import TransportCardApply from "../Pages/CardApply/TransportCardApply";
 
 export const router = createBrowserRouter([
     {
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
             {path :'/schedule',Component : Schedule},
             {path :'/busdetails/:id' , element:<PrivateRoute><BusDetails></BusDetails></PrivateRoute>},
             {path : '/forbidden' , Component:Forbidden},
+            {path : '/cardapply',Component : TransportCardApply},
         ]
     },
     {

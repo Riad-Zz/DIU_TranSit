@@ -6,13 +6,13 @@ import { Navigate } from 'react-router';
 
 const AdminRoute = ({ children }) => {
     const { loading, user } = use(AuthContext);
-    const CurrentLoggedInUser = useLoggedInUser(user?.email);
+    const {LoggedInUser,isLoading} = useLoggedInUser(user?.email);
 
-    if (loading) {
+    if (loading || isLoading) {
         return <Loader />;
     }
 
-    const role = CurrentLoggedInUser?.LoggedInUser?.role;
+    const role = LoggedInUser?.role;
 
     if (role !== 'admin') {
         return <Navigate to="/forbidden" replace />;
