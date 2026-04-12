@@ -129,23 +129,23 @@ const Dashboard = () => {
                         <p className='mt-5 mb-2 pl-2 font-medium is-drawer-close:hidden'>GENERAL</p>
                         {/* ==================== List item - 06 ============================*/}
                         <li className='mt-3'>
-                            <NavLink
-                                to="/changepassword"
+                            <button
+                                
                                 className="flex items-center is-drawer-close:tooltip is-drawer-close:tooltip-right "
                                 data-tip="Change Password" >
                                 <RiLockPasswordLine className='is-drawer-open:text-xl'></RiLockPasswordLine>
                                 <span className="is-drawer-close:hidden text-black block">Change Password</span>
-                            </NavLink>
+                            </button>
                         </li>
                         {/* ==================== List item - 07 ============================*/}
                         <li className='mt-3'>
-                            <NavLink
-                                to="/help"
+                            <button
+                                
                                 className="flex items-center is-drawer-close:tooltip is-drawer-close:tooltip-right "
                                 data-tip="Help" >
                                 <GrContact className='is-drawer-open:text-xl'></GrContact>
                                 <span className="is-drawer-close:hidden text-black block">Contact Support</span>
-                            </NavLink>
+                            </button>
                         </li>
                         {/* ==================== List item - 08 ============================*/}
                         <li className='mt-3'>

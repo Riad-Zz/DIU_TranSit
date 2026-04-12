@@ -13,6 +13,7 @@ const Overview = () => {
     const axiosInstance = useAxios() ;
 
     const {user} = use(AuthContext)
+
     const { data: busses = []} = useQuery({
         queryKey: ['busFleetData', user?.email],
         queryFn: async () => {
@@ -20,6 +21,7 @@ const Overview = () => {
             return res.data;
         }
     });
+
     const { data: allUsers = [], isLoading } = useQuery({
             queryKey: ['allUsers', user?.email],
             queryFn: async () => {
@@ -27,13 +29,25 @@ const Overview = () => {
                 return res.data;
             }
         });
+
+        const { data: infos } = useQuery({
+        queryKey: ['paymentStats'],
+        queryFn: async () => {
+            const res = await axiosInstance.get('/payment-stats');
+            return res.data;
+        }
+    });
+
+    // Provide a default value of 0 if the API returns null
+    const totalRevenue = infos?.total_revenue || 0;
+    const totalCount = infos?.total_count || 0;
     // console.log(busses)
     // console.log(students) ;
 
     const stats = [
         {
             title: "Total Transaction",
-            value: "10,000",
+            value: totalRevenue,
             unit: "৳",
             percentage: "2.6",
             icon: MdOutlineShoppingBag,
@@ -51,7 +65,7 @@ const Overview = () => {
         },
         {
             title: "Card Request",
-            value: "1,240",
+            value: totalCount,
             unit: "Reqs",
             percentage: "2.8",
             icon: AiOutlineShoppingCart,

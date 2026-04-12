@@ -20,6 +20,7 @@ import Manage from "../Pages/DashboardPages/Manage/Manage";
 import StudentRoute from "../Providers/StudentRoute/StudentRoute";
 import VarifyError from "../Componets/VarifyError/VarifyError";
 import CardManagement from "../Pages/DashboardPages/CardManagement/CardManagement";
+import PaymentManagement from "../Pages/DashboardPages/PaymentManagement/PaymentManagement";
 
 export const router = createBrowserRouter([
     {
@@ -57,7 +58,8 @@ export const router = createBrowserRouter([
         children : [
             {path : '/dashboard' , element : <AdminRoute><Overview></Overview></AdminRoute>},
             {path :'/manage',element : <AdminRoute><Manage></Manage></AdminRoute>},
-            {path :'/cardrequest' , element : <AdminRoute><CardManagement></CardManagement></AdminRoute>}
+            {path :'/cardrequest' , element : <AdminRoute><CardManagement></CardManagement></AdminRoute>} ,
+            {path:'/paymenthistory',element:<AdminRoute><PaymentManagement></PaymentManagement></AdminRoute>}
         ]
     }
 ])
