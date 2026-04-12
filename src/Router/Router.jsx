@@ -17,6 +17,8 @@ import AdminRoute from "../Providers/AdminRoute/AdminRoute";
 import Forbidden from "../Componets/Forbidden/Forbidden";
 import TransportCardApply from "../Pages/CardApply/TransportCardApply";
 import Manage from "../Pages/DashboardPages/Manage/Manage";
+import StudentRoute from "../Providers/StudentRoute/StudentRoute";
+import VarifyError from "../Componets/VarifyError/VarifyError";
 
 export const router = createBrowserRouter([
     {
@@ -31,7 +33,8 @@ export const router = createBrowserRouter([
             {path :'/schedule',Component : Schedule},
             {path :'/busdetails/:id' , element:<PrivateRoute><BusDetails></BusDetails></PrivateRoute>},
             {path : '/forbidden' , Component:Forbidden},
-            {path : '/cardapply',Component : TransportCardApply},
+            {path : '/varifyError' , Component : VarifyError},
+            {path : '/cardapply',element :<PrivateRoute><StudentRoute><TransportCardApply></TransportCardApply></StudentRoute></PrivateRoute> },
         ]
     },
     {
