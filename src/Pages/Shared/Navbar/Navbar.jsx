@@ -38,7 +38,7 @@ const Navbar = () => {
 
     return (
         <div>
-            <div className='w-full shadow-sm'>
+            <div className='w-full shadow-sm border-b border-gray-300'>
                 <div className="navbar py-4 md:px-4 max-w-11/12 xl:max-w-7xl mx-auto">
                     <div className="navbar-start">
                         <div className="md:hidden dropdown ">

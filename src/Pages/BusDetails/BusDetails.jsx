@@ -7,8 +7,7 @@ import {
     ShieldCheck,
     ChevronLeft,
     Wifi,
-    Plug,
-    Airplay
+    Plug
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import useAxios from '../../hooks/Axios/useAxios';
@@ -18,7 +17,19 @@ const BusDetails = () => {
     const { id } = useParams();
     const axiosInstance = useAxios();
     const navigate = useNavigate();
-    // const [selectedSeats, setSelectedSeats] = useState([]);
+
+    // CENTRALIZED COLOR PALETTE
+    const colors = {
+        primary: '#15803D',       // Forest Green
+        secondary: '#166534',     // Darker Green
+        third: '#BBF7D0',         // Mint Tint
+        text: '#606060',          // Base Content
+        muted: '#9CA3AF',         // Gray-400
+        slate: '#CBD5E1',         // Slate-300 for connecting lines
+        bgLight: '#F9FAFB',       // Neutral-50 / Sidebar BG
+        white: '#FFFFFF',
+        border: '#E5E7EB'         // Neutral-200
+    };
 
     const { data: busData = [], isLoading } = useQuery({
         queryKey: ['bus', id],
@@ -31,15 +42,12 @@ const BusDetails = () => {
 
     const bus = busData[0] || {};
 
-    // Generate dynamic stop times and structured data
     const journeyData = useMemo(() => {
         if (!bus.from_time || !bus.stops_str) return null;
 
-        // Helper to add minutes to "HH:mm:ss" and return formatted "hh:mm AM/PM"
         const getFormattedTime = (baseTime, minutesToAdd) => {
             let [hours, minutes] = baseTime.split(':').map(Number);
             let totalMinutes = hours * 60 + minutes + minutesToAdd;
-            
             let h = Math.floor(totalMinutes / 60) % 24;
             let m = totalMinutes % 60;
             const ampm = h >= 12 ? 'PM' : 'AM';
@@ -48,11 +56,9 @@ const BusDetails = () => {
         };
 
         const rawStops = bus.stops_str.split(', ');
-        
-        // The first stop is the starting point, the last is the destination
         const intermediateStops = rawStops.slice(1, -1).map((name, index) => ({
             name: name,
-            time: getFormattedTime(bus.from_time, (index + 1) * 8) // 8 min intervals
+            time: getFormattedTime(bus.from_time, (index + 1) * 8)
         }));
 
         return {
@@ -63,167 +69,192 @@ const BusDetails = () => {
         };
     }, [bus]);
 
-    if (isLoading) {
-        return (
-            <Loader></Loader>
-        );
-    }
+    if (isLoading) return <Loader />;
 
     if (!journeyData) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6]">
-                <div className="text-slate-400 font-bold uppercase">Bus Information Not Found</div>
+            <div className="min-h-screen flex items-center justify-center bg-white" style={{ color: colors.muted }}>
+                <div className="font-black uppercase tracking-[0.3em]">Bus Not Found</div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#f4f7f6] py-10 px-4 font-sans">
-            <div className="max-w-5xl mx-auto">
+        <div className="min-h-screen bg-white py-12 px-4 font-sans" style={{ color: colors.text }}>
+            <div className="max-w-6xl mx-auto">
 
-                {/* Back Button */}
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-[#0a2533] font-bold mb-6 hover:text-[#15803D] transition-colors"
-                >
-                    <ChevronLeft size={20} /> Back to Schedule
-                </button>
+                {/* --- HEADER SECTION (UNTOUCHED TEXT) --- */}
+                <div className="mb-12 text-center md:text-left">
+                    <button
+                        onClick={() => navigate(-1)}
+                        style={{ color: colors.muted }}
+                        className="group flex items-center gap-2 font-bold mb-6 hover:opacity-80 transition-all text-[11px] uppercase tracking-[0.2em] mx-auto md:mx-0"
+                    >
+                        <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform stroke-[3px]" />
+                        Return to Schedule
+                    </button>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <h3 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-none">
+                        Journey <span className="italic" style={{ color: colors.primary }}>Details</span>
+                    </h3>
+                    <p className="text-sm max-w-xl my-10 md:text-xl opacity-50 uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold italic">
+                        We're here to assist you with your daily campus transportation needs!
+                    </p>
+                </div>
 
-                    {/* Left Column: Route Info & Timeline */}
-                    <div className="lg:col-span-2 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                        {/* Header Card */}
-                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <span className="bg-[#15803D]/10 text-[#15803D] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-                                        Route {journeyData.route_id}
-                                    </span>
-                                    <h1 className="text-3xl font-black text-[#0a2533] mt-2 italic uppercase">
-                                        {journeyData.from} <span className="text-[#15803D] not-italic">→</span> {journeyData.to}
+                    {/* --- LEFT CONTENT --- */}
+                    <div className="lg:col-span-8 space-y-6">
+
+                        {/* Card 1: Route Details */}
+                        <div 
+                            className="p-8 md:p-12 rounded-2xl border shadow-sm"
+                            style={{ backgroundColor: colors.bgLight, borderColor: colors.border }}
+                        >
+                            <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-10">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-md" style={{ backgroundColor: colors.third }}>
+                                            <ShieldCheck size={16} style={{ color: colors.primary }} />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: colors.primary }}>
+                                            Route {journeyData.route_id}
+                                        </span>
+                                    </div>
+                                    <h1 className="text-3xl md:text-5xl font-bold text-basse-content italic uppercase tracking-tighter leading-none">
+                                        {journeyData.from} <span className="mx-1 opacity-20">→</span> {journeyData.to}
                                     </h1>
-                                    <p className="text-slate-500 font-medium mt-1">University Special / Hino 1J</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">Daily Campus Shuttle Service</p>
                                 </div>
-                                <div className="text-right">
-                                    <div className="text-3xl font-black text-[#15803D]">৳{journeyData.price}</div>
-                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Per Ticket</p>
+                                <div className="md:text-right">
+                                    <p className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-30">Ticket Fare</p>
+                                    <div className="text-5xl font-black tracking-tighter italic" style={{ color: colors.primary }}>৳{journeyData.price}</div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-4 border-t border-slate-100 pt-6">
-                                <div className="flex items-center gap-3">
-                                    <Clock className="text-[#15803D]" size={20} />
-                                    <div>
-                                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Departure</p>
-                                        <p className="font-bold text-[#0a2533]">{journeyData.startTimeFormatted}</p>
-                                    </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t" style={{ borderColor: colors.border }}>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[9px] uppercase font-black tracking-widest opacity-40 flex items-center gap-2">
+                                        <Clock size={12}/> Departure
+                                    </span>
+                                    <span className="font-black text-xl italic">{journeyData.startTimeFormatted}</span>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <Users className="text-[#15803D]" size={20} />
-                                    <div>
-                                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Seats</p>
-                                        <p className="font-bold text-[#0a2533]">{journeyData.seats} Available</p>
-                                    </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[9px] uppercase font-black tracking-widest opacity-40 flex items-center gap-2">
+                                        <Users size={12}/> Availability
+                                    </span>
+                                    <span className="font-black text-xl italic">{journeyData.seats} Seats</span>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <ShieldCheck className="text-[#15803D]" size={20} />
-                                    <div>
-                                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Day</p>
-                                        <p className="font-bold text-emerald-600">{journeyData.day}</p>
-                                    </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[9px] uppercase font-black tracking-widest opacity-40 flex items-center gap-2">
+                                        <MapPin size={12}/> Schedule
+                                    </span>
+                                    <span className="font-black text-xl italic" style={{ color: colors.primary }}>{journeyData.day}</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Timeline Card */}
-                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                            <h2 className="text-[#0a2533] font-black uppercase text-sm tracking-widest mb-8 flex items-center gap-2">
-                                <MapPin size={18} className="text-[#15803D]" /> Journey Timeline
+                        {/* Card 2: Station Roadmap */}
+                        <div 
+                            className="p-8 md:p-12 rounded-2xl border shadow-sm"
+                            style={{ backgroundColor: colors.bgLight, borderColor: colors.border }}
+                        >
+                            <h2 className="font-black uppercase text-xs tracking-[0.3em] mb-12 flex items-center gap-3">
+                                <div className="p-2 rounded-md">
+                                    <MapPin size={16} style={{ color: colors.primary }} />
+                                </div>
+                                Roadmap Details
                             </h2>
-                            <div className="relative border-l-2 border-dotted border-slate-200 ml-3 space-y-10">
-                                {/* Start Point */}
-                                <div className="relative pl-8">
-                                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#15803D] border-4 border-white shadow-sm"></div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-black text-[#0a2533] text-lg uppercase">{journeyData.from}</span>
-                                        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">{journeyData.startTimeFormatted}</span>
+                            
+                            
+                            <div className="relative border-l-2 ml-4 space-y-12" style={{ borderColor: colors.slate }}>
+                                <div className="relative pl-10">
+                                    <div 
+                                        className="absolute -left-[9px]  top-1 w-4 h-4 rounded-full ring-4 ring-white shadow-sm"
+                                        style={{ backgroundColor: colors.primary }}
+                                    ></div>
+                                    <div className="flex justify-between items-start">
+                                        <span className="font-black  text-2xl uppercase tracking-tighter">{journeyData.from}</span>
+                                        <span 
+                                            className="text-[10px] font-black px-2 py-0.5 rounded bg-gray-200"
+                                            style={{ color: colors.primary}}
+                                        >
+                                            {journeyData.startTimeFormatted}
+                                        </span>
                                     </div>
-                                    <p className="text-xs text-slate-400 font-medium">Initial Pickup</p>
                                 </div>
 
-                                {/* Intermediate Stops */}
                                 {journeyData.intermediateStops.map((stop, index) => (
-                                    <div key={index} className="relative pl-8 group">
-                                        <div className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-white border-2 border-slate-300 group-hover:border-[#15803D] transition-colors"></div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-bold text-slate-600 group-hover:text-[#0a2533] transition-colors">{stop.name}</span>
-                                            <span className="text-xs font-semibold text-slate-400">{stop.time}</span>
+                                    <div key={index} className="relative pl-10 group">
+                                        <div 
+                                            className="absolute -left-[5px] top-2 w-2 h-2 rounded-full ring-2 ring-white transition-colors"
+                                            style={{ backgroundColor: colors.slate }}
+                                        ></div>
+                                        <div className="flex justify-between items-center pr-4">
+                                            <span className="text-sm font-bold opacity-60 group-hover:opacity-100 transition-opacity uppercase tracking-wide">{stop.name}</span>
+                                            <span className="text-[9px] font-black opacity-30 uppercase italic hover:text-primary hover:opacity-90">{stop.time}</span>
                                         </div>
                                     </div>
                                 ))}
 
-                                {/* End Point */}
-                                <div className="relative pl-8">
-                                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#0a2533] border-4 border-white shadow-sm"></div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-black text-[#0a2533] text-lg uppercase">{journeyData.to}</span>
-                                        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">{journeyData.endTimeFormatted}</span>
+                                <div className="relative pl-10">
+                                    <div 
+                                        className="absolute -left-[9px] top-1 w-4 h-4 rounded-full ring-4 ring-white shadow-sm"
+                                        style={{ backgroundColor: colors.text }}
+                                    ></div>
+                                    <div className="flex justify-between items-start">
+                                        <span className="font-black text-2xl uppercase tracking-tighter">{journeyData.to}</span>
+                                        <span className="text-[10px] font-black opacity-80 bg-gray-200 px-2 py-0.5 rounded text-primary">{journeyData.endTimeFormatted}</span>
                                     </div>
-                                    <p className="text-xs text-slate-400 font-medium">Campus Drop-off</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column: Amenities & Actions */}
-                    <div className="space-y-6">
-                        {/* Amenities */}
-                        <div className="bg-[#0a2533] p-8 rounded-3xl text-white">
-                            <h3 className="font-black uppercase tracking-widest text-xs text-[#15803D] mb-6">Bus Amenities</h3>
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="flex items-center gap-3 opacity-80 hover:opacity-100 transition-opacity">
-                                    <Wifi size={20} className="text-[#15803D]" />
-                                    <span className="text-xs font-bold uppercase tracking-tighter">Free WiFi</span>
+                    {/* --- RIGHT SIDEBAR  --- */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="bg-slate-900 p-8 rounded-2xl text-white shadow-xl">
+                            <h3 className="text-emerald-500 font-black uppercase text-[10px] tracking-[0.3em] mb-10">Booking Summary</h3>
+                            <div className="space-y-6 mb-10">
+                                <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                                    <span className="text-white/40 text-[9px] font-black uppercase tracking-widest">Student Pass</span>
+                                    <span className="text-white font-black italic text-sm uppercase tracking-tight">Active ID</span>
                                 </div>
-                                <div className="flex items-center gap-3 opacity-80 hover:opacity-100 transition-opacity">
-                                    <Plug size={20} className="text-[#15803D]" />
-                                    <span className="text-xs font-bold uppercase tracking-tighter">Charging</span>
+                                <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                                    <span className="text-white/40 text-[9px] font-black uppercase tracking-widest">Route Type</span>
+                                    <span className="text-white font-black italic text-sm uppercase tracking-tight">Express</span>
                                 </div>
-                                <div className="flex items-center gap-3 opacity-40">
-                                    <Airplay size={20} />
-                                    <span className="text-xs font-bold uppercase tracking-tighter line-through">Entertainment</span>
+                                <div className="pt-4 flex flex-col">
+                                    <p className="text-primary font-black uppercase text-[10px] tracking-widest mb-2">Total Payable</p>
+                                    <span className="text-5xl font-black tracking-tighter italic">৳{journeyData.price}</span>
+                                </div>
+                            </div>
+                            <button className="w-full bg-emerald-600 text-white font-black uppercase py-5 rounded-xl tracking-[4px] text-xs hover:bg-emerald-500 transition-all active:scale-95 shadow-lg shadow-emerald-900/40">
+                                Confirm & Reserve
+                            </button>
+                            <div className="mt-12 space-y-4 border-t border-white/10 pt-8">
+                                <div className="flex items-center gap-4 text-white/60">
+                                    <Wifi size={16} className="text-emerald-500" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">On-Board WiFi</span>
+                                </div>
+                                <div className="flex items-center gap-4 text-white/60">
+                                    <Plug size={16} className="text-emerald-500" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">Charging Ports</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Order Summary */}
-                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                            <h3 className="text-[#0a2533] font-black uppercase text-sm tracking-widest mb-6">Purchase Summary</h3>
-                            <div className="space-y-4 mb-6">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500 font-medium">Selected Route</span>
-                                    <span className="text-[#0a2533] font-bold italic">{journeyData.route_id}</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500 font-medium">Tickets</span>
-                                    <span className="text-[#0a2533] font-bold">1 Adult Passenger</span>
-                                </div>
-                                <div className="border-t border-slate-100 pt-4 flex justify-between items-center">
-                                    <span className="text-[#0a2533] font-black uppercase text-xs">Total Fare</span>
-                                    <span className="text-2xl font-black text-[#15803D]">৳{journeyData.price}</span>
-                                </div>
-                            </div>
-                            <button className="w-full bg-[#15803D] text-white font-black uppercase py-4 rounded-2xl tracking-[2px] shadow-lg shadow-[#15803D]/20 hover:bg-[#116631] transition-all active:scale-95">
-                                Book This Trip
-                            </button>
-                            <p className="text-[10px] text-center text-slate-400 mt-4 leading-relaxed uppercase font-bold px-4">
-                                Secure checkout by DIU Transport Service.
+                        <div 
+                            className="p-8 text-center border rounded-2xl shadow-sm"
+                            style={{ backgroundColor: colors.bgLight, borderColor: colors.border }}
+                        >
+                            <h4 className="font-black text-xs uppercase tracking-[0.2em] mb-3">Need Assistance?</h4>
+                            <p className="text-[11px] font-bold uppercase leading-relaxed tracking-tighter opacity-50">
+                                Our support team is available <br /> for your campus transport needs.
                             </p>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
