@@ -4,6 +4,7 @@ import loginImage from "../../assets/logIn.png";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../Providers/AuthProvider/AuthProvider";
+import { toast } from "react-toastify";
 
 
 const Login = () => {
@@ -32,10 +33,12 @@ const Login = () => {
         emailLogin(data.email,data.password).then((result)=>{
             const user = result.user ;
             setUser(user) ;
+            toast.success("Successfully logged in!");
             navigate(location.state || '/');
         })
         .catch((error)=>{
             console.log(error.message) ;
+            toast.error(error.message);
         })
     }
 
@@ -44,11 +47,13 @@ const Login = () => {
         googleLogin().then((result)=>{
             const currentUser = result.user ;
             setUser(currentUser);
+            toast.success("Successfully logged in!");
             navigate(location.state || '/') 
         })
         .catch((error)=>{
             const erroeMessage = error.message ;
             console.log(erroeMessage) ;
+            toast.error(`Login failed: ${erroeMessage}`);
         })
     }
 

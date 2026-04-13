@@ -7,6 +7,7 @@ import imageUpload from '../../assets/avatat.png'
 import { AuthContext } from '../../Providers/AuthProvider/AuthProvider';
 import axios from 'axios';
 import useAxios from "../../hooks/Axios/useAxios"
+import { toast } from 'react-toastify';
 
 const Register = () => {
 
@@ -37,6 +38,7 @@ const Register = () => {
         e.preventDefault();
         setEye(!eye);
     }
+    
 
     const handleRegister = async (data, e) => {
         console.log(data);
@@ -56,6 +58,7 @@ const Register = () => {
             .then(async (result) => {
                 const currentUser = result.user
                 setUser(currentUser);
+                toast.success("Registration successful!"); // Success toast
                 navigate(location.state || '/');
                 if (currentUser) {
                     await updateUser({ displayName: data.name, photoURL: finalImageURL })
@@ -65,6 +68,7 @@ const Register = () => {
                         .catch(error => {
                             const errorMessage = error.message;
                             console.log(errorMessage);
+                            toast.error(errorMessage); // Error toast for profile update
                         })
                     const newUser = {
                         name: data.name,
@@ -74,43 +78,54 @@ const Register = () => {
                     //-------------Save the user to Database ---------------------
                     axiosInstance.post('/users', newUser)
                         .then(data => {
-                            if(data.data.id){
-                                console.log(data.data.id) ;
+                            if (data.data.id) {
+                                console.log(data.data.id);
                             }
                         })
 
-                    
+
                 }
+            })
+            .catch(error => {
+                const errorMessage = error.message;
+                console.log(errorMessage);
+                toast.error(errorMessage); // Error toast for registration
             })
     }
 
     //-----------------Handle Google Login --------------------------------
     const handleGoogleLogin = () => {
-        googleLogin().then((result) => {
-            const currentUser = result.user
-            setUser(currentUser);
-            navigate(location.state || '/');
+        googleLogin()
+            .then((result) => {
+                const currentUser = result.user;
+                setUser(currentUser);
+                toast.success("Successfully logged in!");
+                navigate(location.state || '/');
+                const newUser = {
+                    name: currentUser.displayName,
+                    email: currentUser.email,
+                };
 
-            const newUser = {
-                name: currentUser.displayName,
-                email: currentUser.email,
-            }
+                //-------------Save the user to Database ---------------------
+                axiosInstance.post('/users', newUser)
+                    .then(data => {
+                        console.log(data);
+                        if (data.data.id) {
+                            console.log(data.data.id);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Database save error:", err);
 
-            //-------------Save the user to Database ---------------------
-                    axiosInstance.post('/users', newUser)
-                        .then(data => {
-                            console.log(data) ;
-                            if(data.data.id){
-                                console.log(data.data.id) ;
-                            }
-                        })
+                    });
 
-        })
+            })
             .catch((error) => {
                 const errorMessage = error.message;
                 console.log(errorMessage);
+                toast.error(`Login failed: ${errorMessage}`);
             });
-    }
+    };
 
 
     return (
