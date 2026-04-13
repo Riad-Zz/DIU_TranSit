@@ -9,12 +9,14 @@ import banner1 from '../../../assets/busses.png';
 import banner2 from '../../../assets/routesss.png';
 import banner3 from '../../../assets/service.png';
 import { CiClock1 } from "react-icons/ci";
+import { useNavigate } from 'react-router';
 
 const Banner = () => {
 
     const title1 = <>Your Daily <span className='text-primary'>DIU Bus Ride</span>, Made Simple</>;
     const title2 = <>Track Routes,<span className='text-primary'>Schedules</span> in One Place</>;
     const title3 = <>Enjoy a Smarter, Safer <span className='text-primary'>Campus Commute</span></>;
+    const navigate = useNavigate() ;
 
     const allBanners = [
         {
@@ -70,14 +72,12 @@ const Banner = () => {
                                 <div className="flex my-3 flex-wrap gap-3 sm:gap-4 justify-center xl:justify-start">
 
                                     <div className="flex justify-center gap-px">
-                                        <button className="flex justify-center btn-base py-2.5 sm:py-3 px-5 sm:px-6 bg-primary text-white border border-transparent hover:bg-transparent hover:border-[#DADADA] hover:text-black transition-all">
+                                        <button onClick={()=>navigate('/cardapply')} className="flex justify-center btn-base py-2.5 sm:py-3 px-5 sm:px-6 bg-primary text-white border border-transparent hover:bg-transparent hover:border-[#DADADA] hover:text-black transition-all">
                                             Apply for Card <MdArrowOutward className='inline text-xl'></MdArrowOutward>
                                         </button>
                                     </div>
 
-                                    <button className="btn-base py-2.5 hover:bg-primary hover:text-white transition-all sm:py-3 px-5 sm:px-6 border border-[#DADADA] text-black">
-                                        Be a Rider
-                                    </button>
+                                    
                                 </div>
                             </div>
 
